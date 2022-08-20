@@ -102,19 +102,20 @@
 #endif
 
 #if defined(__OpenBSD__) || defined(__DragonFly__)
-struct drm_pciinfo {
-	uint16_t	domain;
-	uint8_t		bus;
-	uint8_t		dev;
-	uint8_t		func;
-	uint16_t	vendor_id;
-	uint16_t	device_id;
-	uint16_t	subvendor_id;
-	uint16_t	subdevice_id;
-	uint8_t		revision_id;
+struct drm_pciinfo
+{
+    uint16_t domain;
+    uint8_t bus;
+    uint8_t dev;
+    uint8_t func;
+    uint16_t vendor_id;
+    uint16_t device_id;
+    uint16_t subvendor_id;
+    uint16_t subdevice_id;
+    uint8_t revision_id;
 };
 
-#define DRM_IOCTL_GET_PCIINFO	DRM_IOR(0x15, struct drm_pciinfo)
+#define DRM_IOCTL_GET_PCIINFO DRM_IOR(0x15, struct drm_pciinfo)
 #endif
 
 #define DRM_MSG_VERBOSITY 3
@@ -126,39 +127,43 @@ static drmServerInfoPtr drm_server_info;
 static bool drmNodeIsDRM(int maj, int min);
 static char *drmGetMinorNameForFD(int fd, int type);
 
-#define DRM_MODIFIER(v, f, f_name) \
-       .modifier = DRM_FORMAT_MOD_##v ## _ ##f, \
-       .modifier_name = #f_name
+#define DRM_MODIFIER(v, f, f_name)        \
+    .modifier = DRM_FORMAT_MOD_##v##_##f, \
+    .modifier_name = #f_name
 
 #define DRM_MODIFIER_INVALID(v, f_name) \
-       .modifier = DRM_FORMAT_MOD_INVALID, .modifier_name = #f_name
+    .modifier = DRM_FORMAT_MOD_INVALID, .modifier_name = #f_name
 
 #define DRM_MODIFIER_LINEAR(v, f_name) \
-       .modifier = DRM_FORMAT_MOD_LINEAR, .modifier_name = #f_name
+    .modifier = DRM_FORMAT_MOD_LINEAR, .modifier_name = #f_name
 
 /* Intel is abit special as the format doesn't follow other vendors naming
  * scheme */
 #define DRM_MODIFIER_INTEL(f, f_name) \
-       .modifier = I915_FORMAT_MOD_##f, .modifier_name = #f_name
+    .modifier = I915_FORMAT_MOD_##f, .modifier_name = #f_name
 
-struct drmFormatModifierInfo {
+struct drmFormatModifierInfo
+{
     uint64_t modifier;
     const char *modifier_name;
 };
 
-struct drmFormatModifierVendorInfo {
+struct drmFormatModifierVendorInfo
+{
     uint8_t vendor;
     const char *vendor_name;
 };
 
 #include "generated_static_table_fourcc.h"
 
-struct drmVendorInfo {
+struct drmVendorInfo
+{
     uint8_t vendor;
     char *(*vendor_cb)(uint64_t modifier);
 };
 
-struct drmFormatVendorModifierInfo {
+struct drmFormatVendorModifierInfo
+{
     uint64_t modifier;
     const char *modifier_name;
 };
@@ -176,35 +181,36 @@ static char *
 drmGetFormatModifierNameFromAmlogic(uint64_t modifier);
 
 static const struct drmVendorInfo modifier_format_vendor_table[] = {
-    { DRM_FORMAT_MOD_VENDOR_ARM, drmGetFormatModifierNameFromArm },
-    { DRM_FORMAT_MOD_VENDOR_NVIDIA, drmGetFormatModifierNameFromNvidia },
-    { DRM_FORMAT_MOD_VENDOR_AMD, drmGetFormatModifierNameFromAmd },
-    { DRM_FORMAT_MOD_VENDOR_AMLOGIC, drmGetFormatModifierNameFromAmlogic },
+    {DRM_FORMAT_MOD_VENDOR_ARM, drmGetFormatModifierNameFromArm},
+    {DRM_FORMAT_MOD_VENDOR_NVIDIA, drmGetFormatModifierNameFromNvidia},
+    {DRM_FORMAT_MOD_VENDOR_AMD, drmGetFormatModifierNameFromAmd},
+    {DRM_FORMAT_MOD_VENDOR_AMLOGIC, drmGetFormatModifierNameFromAmlogic},
 };
 
 #ifndef AFBC_FORMAT_MOD_MODE_VALUE_MASK
-#define AFBC_FORMAT_MOD_MODE_VALUE_MASK	0x000fffffffffffffULL
+#define AFBC_FORMAT_MOD_MODE_VALUE_MASK 0x000fffffffffffffULL
 #endif
 
 static const struct drmFormatVendorModifierInfo arm_mode_value_table[] = {
-    { AFBC_FORMAT_MOD_YTR,          "YTR" },
-    { AFBC_FORMAT_MOD_SPLIT,        "SPLIT" },
-    { AFBC_FORMAT_MOD_SPARSE,       "SPARSE" },
-    { AFBC_FORMAT_MOD_CBR,          "CBR" },
-    { AFBC_FORMAT_MOD_TILED,        "TILED" },
-    { AFBC_FORMAT_MOD_SC,           "SC" },
-    { AFBC_FORMAT_MOD_DB,           "DB" },
-    { AFBC_FORMAT_MOD_BCH,          "BCH" },
-    { AFBC_FORMAT_MOD_USM,          "USM" },
+    {AFBC_FORMAT_MOD_YTR, "YTR"},
+    {AFBC_FORMAT_MOD_SPLIT, "SPLIT"},
+    {AFBC_FORMAT_MOD_SPARSE, "SPARSE"},
+    {AFBC_FORMAT_MOD_CBR, "CBR"},
+    {AFBC_FORMAT_MOD_TILED, "TILED"},
+    {AFBC_FORMAT_MOD_SC, "SC"},
+    {AFBC_FORMAT_MOD_DB, "DB"},
+    {AFBC_FORMAT_MOD_BCH, "BCH"},
+    {AFBC_FORMAT_MOD_USM, "USM"},
 };
 
 static bool is_x_t_amd_gfx9_tile(uint64_t tile)
 {
-    switch (tile) {
+    switch (tile)
+    {
     case AMD_FMT_MOD_TILE_GFX9_64K_S_X:
     case AMD_FMT_MOD_TILE_GFX9_64K_D_X:
     case AMD_FMT_MOD_TILE_GFX9_64K_R_X:
-           return true;
+        return true;
     }
 
     return false;
@@ -221,7 +227,8 @@ drmGetAfbcFormatModifierNameFromArm(uint64_t modifier, FILE *fp)
     bool did_print_mode = false;
 
     /* add block, can only have a (single) block */
-    switch (block_size) {
+    switch (block_size)
+    {
     case AFBC_FORMAT_MOD_BLOCK_SIZE_16x16:
         block = "16x16";
         break;
@@ -236,20 +243,26 @@ drmGetAfbcFormatModifierNameFromArm(uint64_t modifier, FILE *fp)
         break;
     }
 
-    if (!block) {
+    if (!block)
+    {
         return false;
     }
 
     fprintf(fp, "BLOCK_SIZE=%s,", block);
 
     /* add mode */
-    for (unsigned int i = 0; i < ARRAY_SIZE(arm_mode_value_table); i++) {
-        if (arm_mode_value_table[i].modifier & mode_value) {
+    for (unsigned int i = 0; i < ARRAY_SIZE(arm_mode_value_table); i++)
+    {
+        if (arm_mode_value_table[i].modifier & mode_value)
+        {
             mode = arm_mode_value_table[i].modifier_name;
-            if (!did_print_mode) {
+            if (!did_print_mode)
+            {
                 fprintf(fp, "MODE=%s", mode);
                 did_print_mode = true;
-            } else {
+            }
+            else
+            {
                 fprintf(fp, "|%s", mode);
             }
         }
@@ -262,12 +275,14 @@ static bool
 drmGetAfrcFormatModifierNameFromArm(uint64_t modifier, FILE *fp)
 {
     bool scan_layout;
-    for (unsigned int i = 0; i < 2; ++i) {
+    for (unsigned int i = 0; i < 2; ++i)
+    {
         uint64_t coding_unit_block =
-          (modifier >> (i * 4)) & AFRC_FORMAT_MOD_CU_SIZE_MASK;
+            (modifier >> (i * 4)) & AFRC_FORMAT_MOD_CU_SIZE_MASK;
         const char *coding_unit_size = NULL;
 
-        switch (coding_unit_block) {
+        switch (coding_unit_block)
+        {
         case AFRC_FORMAT_MOD_CU_SIZE_16:
             coding_unit_size = "CU_16";
             break;
@@ -279,25 +294,33 @@ drmGetAfrcFormatModifierNameFromArm(uint64_t modifier, FILE *fp)
             break;
         }
 
-        if (!coding_unit_size) {
-            if (i == 0) {
+        if (!coding_unit_size)
+        {
+            if (i == 0)
+            {
                 return false;
             }
             break;
         }
 
-        if (i == 0) {
+        if (i == 0)
+        {
             fprintf(fp, "P0=%s,", coding_unit_size);
-        } else {
+        }
+        else
+        {
             fprintf(fp, "P12=%s,", coding_unit_size);
         }
     }
 
     scan_layout =
         (modifier & AFRC_FORMAT_MOD_LAYOUT_SCAN) == AFRC_FORMAT_MOD_LAYOUT_SCAN;
-    if (scan_layout) {
+    if (scan_layout)
+    {
         fprintf(fp, "SCAN");
-    } else {
+    }
+    else
+    {
         fprintf(fp, "ROT");
     }
     return true;
@@ -317,7 +340,8 @@ drmGetFormatModifierNameFromArm(uint64_t modifier)
     if (!fp)
         return NULL;
 
-    switch (type) {
+    switch (type)
+    {
     case DRM_FORMAT_MOD_ARM_TYPE_AFBC:
         result = drmGetAfbcFormatModifierNameFromArm(modifier, fp);
         break;
@@ -332,7 +356,8 @@ drmGetFormatModifierNameFromArm(uint64_t modifier)
     }
 
     fclose(fp);
-    if (!result) {
+    if (!result)
+    {
         free(modifier_name);
         return NULL;
     }
@@ -354,22 +379,24 @@ drmGetFormatModifierNameFromNvidia(uint64_t modifier)
 
     /* just in case there could other simpler modifiers, not yet added, avoid
      * testing against TEGRA_TILE */
-    if ((modifier & 0x10) == 0x10) {
+    if ((modifier & 0x10) == 0x10)
+    {
         char *mod_nvidia;
-        asprintf(&mod_nvidia, "BLOCK_LINEAR_2D,HEIGHT=%"PRIu64",KIND=%"PRIu64","
-                 "GEN=%"PRIu64",SECTOR=%"PRIu64",COMPRESSION=%"PRIu64"", height,
+        asprintf(&mod_nvidia, "BLOCK_LINEAR_2D,HEIGHT=%" PRIu64 ",KIND=%" PRIu64 ","
+                              "GEN=%" PRIu64 ",SECTOR=%" PRIu64 ",COMPRESSION=%" PRIu64 "",
+                 height,
                  kind, gen, sector, compression);
         return mod_nvidia;
     }
 
-    return  NULL;
+    return NULL;
 }
 
 static void
 drmGetFormatModifierNameFromAmdDcc(uint64_t modifier, FILE *fp)
 {
     uint64_t dcc_max_compressed_block =
-                AMD_FMT_MOD_GET(DCC_MAX_COMPRESSED_BLOCK, modifier);
+        AMD_FMT_MOD_GET(DCC_MAX_COMPRESSED_BLOCK, modifier);
     uint64_t dcc_retile = AMD_FMT_MOD_GET(DCC_RETILE, modifier);
 
     const char *dcc_max_compressed_block_str = NULL;
@@ -388,7 +415,8 @@ drmGetFormatModifierNameFromAmdDcc(uint64_t modifier, FILE *fp)
     if (AMD_FMT_MOD_GET(DCC_INDEPENDENT_128B, modifier))
         fprintf(fp, ",DCC_INDEPENDENT_128B");
 
-    switch (dcc_max_compressed_block) {
+    switch (dcc_max_compressed_block)
+    {
     case AMD_FMT_MOD_DCC_BLOCK_64B:
         dcc_max_compressed_block_str = "64B";
         break;
@@ -420,27 +448,31 @@ drmGetFormatModifierNameFromAmdTile(uint64_t modifier, FILE *fp)
     dcc_retile = AMD_FMT_MOD_GET(DCC_RETILE, modifier);
     tile_version = AMD_FMT_MOD_GET(TILE_VERSION, modifier);
 
-    fprintf(fp, ",PIPE_XOR_BITS=%"PRIu64, pipe_xor_bits);
+    fprintf(fp, ",PIPE_XOR_BITS=%" PRIu64, pipe_xor_bits);
 
-    if (tile_version == AMD_FMT_MOD_TILE_VER_GFX9) {
+    if (tile_version == AMD_FMT_MOD_TILE_VER_GFX9)
+    {
         bank_xor_bits = AMD_FMT_MOD_GET(BANK_XOR_BITS, modifier);
-        fprintf(fp, ",BANK_XOR_BITS=%"PRIu64, bank_xor_bits);
+        fprintf(fp, ",BANK_XOR_BITS=%" PRIu64, bank_xor_bits);
     }
 
-    if (tile_version == AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS) {
+    if (tile_version == AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS)
+    {
         packers = AMD_FMT_MOD_GET(PACKERS, modifier);
-        fprintf(fp, ",PACKERS=%"PRIu64, packers);
+        fprintf(fp, ",PACKERS=%" PRIu64, packers);
     }
 
-    if (dcc && tile_version == AMD_FMT_MOD_TILE_VER_GFX9) {
+    if (dcc && tile_version == AMD_FMT_MOD_TILE_VER_GFX9)
+    {
         rb = AMD_FMT_MOD_GET(RB, modifier);
-        fprintf(fp, ",RB=%"PRIu64, rb);
+        fprintf(fp, ",RB=%" PRIu64, rb);
     }
 
     if (dcc && tile_version == AMD_FMT_MOD_TILE_VER_GFX9 &&
-        (dcc_retile || pipe_align)) {
+        (dcc_retile || pipe_align))
+    {
         pipe = AMD_FMT_MOD_GET(PIPE, modifier);
-        fprintf(fp, ",PIPE_%"PRIu64, pipe);
+        fprintf(fp, ",PIPE_%" PRIu64, pipe);
     }
 }
 
@@ -464,7 +496,8 @@ drmGetFormatModifierNameFromAmd(uint64_t modifier)
         return NULL;
 
     /* add tile  */
-    switch (tile_version) {
+    switch (tile_version)
+    {
     case AMD_FMT_MOD_TILE_VER_GFX9:
         str_tile_version = "GFX9";
         break;
@@ -476,16 +509,20 @@ drmGetFormatModifierNameFromAmd(uint64_t modifier)
         break;
     }
 
-    if (str_tile_version) {
+    if (str_tile_version)
+    {
         fprintf(fp, "%s", str_tile_version);
-    } else {
+    }
+    else
+    {
         fclose(fp);
         free(mod_amd);
         return NULL;
     }
 
     /* add tile str */
-    switch (tile) {
+    switch (tile)
+    {
     case AMD_FMT_MOD_TILE_GFX9_64K_S:
         str_tile = "GFX9_64K_S";
         break;
@@ -526,16 +563,17 @@ drmGetFormatModifierNameFromAmlogic(uint64_t modifier)
     const char *layout_str;
     const char *opts_str;
 
-    switch (layout) {
+    switch (layout)
+    {
     case AMLOGIC_FBC_LAYOUT_BASIC:
-       layout_str = "BASIC";
-       break;
+        layout_str = "BASIC";
+        break;
     case AMLOGIC_FBC_LAYOUT_SCATTER:
-       layout_str = "SCATTER";
-       break;
+        layout_str = "SCATTER";
+        break;
     default:
-       layout_str = "INVALID_LAYOUT";
-       break;
+        layout_str = "INVALID_LAYOUT";
+        break;
     }
 
     if (options & AMLOGIC_FBC_OPTION_MEM_SAVING)
@@ -551,17 +589,19 @@ static unsigned log2_int(unsigned x)
 {
     unsigned l;
 
-    if (x < 2) {
+    if (x < 2)
+    {
         return 0;
     }
-    for (l = 2; ; l++) {
-        if ((unsigned)(1 << l) > x) {
+    for (l = 2;; l++)
+    {
+        if ((unsigned)(1 << l) > x)
+        {
             return l - 1;
         }
     }
     return 0;
 }
-
 
 drm_public void drmSetServerInfo(drmServerInfoPtr info)
 {
@@ -578,7 +618,7 @@ drm_public void drmSetServerInfo(drmServerInfoPtr info)
  */
 
 static int DRM_PRINTFLIKE(1, 0)
-drmDebugPrint(const char *format, va_list ap)
+    drmDebugPrint(const char *format, va_list ap)
 {
     return vfprintf(stderr, format, ap);
 }
@@ -592,9 +632,12 @@ drmMsg(const char *format, ...)
         (drm_server_info && drm_server_info->debug_print))
     {
         va_start(ap, format);
-        if (drm_server_info) {
-            drm_server_info->debug_print(format,ap);
-        } else {
+        if (drm_server_info)
+        {
+            drm_server_info->debug_print(format, ap);
+        }
+        else
+        {
             drmDebugPrint(format, ap);
         }
         va_end(ap);
@@ -626,7 +669,8 @@ drmIoctl(int fd, unsigned long request, void *arg)
 {
     int ret;
 
-    do {
+    do
+    {
         ret = ioctl(fd, request, arg);
     } while (ret == -1 && (errno == EINTR || errno == EAGAIN));
     return ret;
@@ -634,7 +678,7 @@ drmIoctl(int fd, unsigned long request, void *arg)
 
 static unsigned long drmGetKeyFromFd(int fd)
 {
-    stat_t     st;
+    stat_t st;
 
     st.st_rdev = 0;
     fstat(fd, &st);
@@ -644,19 +688,22 @@ static unsigned long drmGetKeyFromFd(int fd)
 drm_public drmHashEntry *drmGetEntry(int fd)
 {
     unsigned long key = drmGetKeyFromFd(fd);
-    void          *value;
-    drmHashEntry  *entry;
+    void *value;
+    drmHashEntry *entry;
 
     if (!drmHashTable)
         drmHashTable = drmHashCreate();
 
-    if (drmHashLookup(drmHashTable, key, &value)) {
-        entry           = drmMalloc(sizeof(*entry));
-        entry->fd       = fd;
-        entry->f        = NULL;
+    if (drmHashLookup(drmHashTable, key, &value))
+    {
+        entry = drmMalloc(sizeof(*entry));
+        entry->fd = fd;
+        entry->f = NULL;
         entry->tagTable = drmHashCreate();
         drmHashInsert(drmHashTable, key, entry);
-    } else {
+    }
+    else
+    {
         entry = value;
     }
     return entry;
@@ -682,13 +729,15 @@ static int drmMatchBusID(const char *id1, const char *id2, int pci_domain_ok)
         return 1;
 
     /* Try to match old/new-style PCI bus IDs. */
-    if (strncasecmp(id1, "pci", 3) == 0) {
+    if (strncasecmp(id1, "pci", 3) == 0)
+    {
         unsigned int o1, b1, d1, f1;
         unsigned int o2, b2, d2, f2;
         int ret;
 
         ret = sscanf(id1, "pci:%04x:%02x:%02x.%u", &o1, &b1, &d1, &f1);
-        if (ret != 4) {
+        if (ret != 4)
+        {
             o1 = 0;
             ret = sscanf(id1, "PCI:%u:%u:%u", &b1, &d1, &f1);
             if (ret != 3)
@@ -696,7 +745,8 @@ static int drmMatchBusID(const char *id1, const char *id2, int pci_domain_ok)
         }
 
         ret = sscanf(id2, "pci:%04x:%02x:%02x.%u", &o2, &b2, &d2, &f2);
-        if (ret != 4) {
+        if (ret != 4)
+        {
             o2 = 0;
             ret = sscanf(id2, "PCI:%u:%u:%u", &b2, &d2, &f2);
             if (ret != 3)
@@ -735,24 +785,26 @@ static int drmMatchBusID(const char *id1, const char *id2, int pci_domain_ok)
 #if !UDEV
 static int chown_check_return(const char *path, uid_t owner, gid_t group)
 {
-        int rv;
+    int rv;
 
-        do {
-            rv = chown(path, owner, group);
-        } while (rv != 0 && errno == EINTR);
+    do
+    {
+        rv = chown(path, owner, group);
+    } while (rv != 0 && errno == EINTR);
 
-        if (rv == 0)
-            return 0;
+    if (rv == 0)
+        return 0;
 
-        drmMsg("Failed to change owner or group for file %s! %d: %s\n",
-               path, errno, strerror(errno));
-        return -1;
+    drmMsg("Failed to change owner or group for file %s! %d: %s\n",
+           path, errno, strerror(errno));
+    return -1;
 }
 #endif
 
 static const char *drmGetDeviceName(int type)
 {
-    switch (type) {
+    switch (type)
+    {
     case DRM_NODE_PRIMARY:
         return DRM_DEV_NAME;
     case DRM_NODE_CONTROL:
@@ -778,32 +830,39 @@ static const char *drmGetDeviceName(int type)
  */
 static int drmOpenDevice(dev_t dev, int minor, int type)
 {
-    stat_t          st;
-    const char      *dev_name = drmGetDeviceName(type);
-    char            buf[DRM_NODE_NAME_MAX];
-    int             fd;
-    mode_t          devmode = DRM_DEV_MODE, serv_mode;
-    gid_t           serv_group;
+    stat_t st;
+    const char *dev_name = drmGetDeviceName(type);
+    char buf[DRM_NODE_NAME_MAX];
+    int fd;
+    mode_t devmode = DRM_DEV_MODE, serv_mode;
+    gid_t serv_group;
 #if !UDEV
-    int             isroot  = !geteuid();
-    uid_t           user    = DRM_DEV_UID;
-    gid_t           group   = DRM_DEV_GID;
+    int isroot = !geteuid();
+    uid_t user = DRM_DEV_UID;
+    gid_t group = DRM_DEV_GID;
 #endif
 
     if (!dev_name)
         return -EINVAL;
 
-    sprintf(buf, dev_name, DRM_DIR_NAME, minor);
+    char *myenv;
+    myenv = getenv("DRM_DEVICE_PATH");
+    if (myenv != NULL)
+        strncpy(buf, myenv, 64);
+    else
+        sprintf(buf, dev_name, DRM_DIR_NAME, minor);
     drmMsg("drmOpenDevice: node name is %s\n", buf);
 
-    if (drm_server_info && drm_server_info->get_perms) {
+    if (drm_server_info && drm_server_info->get_perms)
+    {
         drm_server_info->get_perms(&serv_group, &serv_mode);
-        devmode  = serv_mode ? serv_mode : DRM_DEV_MODE;
-        devmode &= ~(S_IXUSR|S_IXGRP|S_IXOTH);
+        devmode = serv_mode ? serv_mode : DRM_DEV_MODE;
+        devmode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);
     }
 
 #if !UDEV
-    if (stat(DRM_DIR_NAME, &st)) {
+    if (stat(DRM_DIR_NAME, &st))
+    {
         if (!isroot)
             return DRM_ERR_NOT_ROOT;
         mkdir(DRM_DIR_NAME, DRM_DEV_DIRMODE);
@@ -812,14 +871,16 @@ static int drmOpenDevice(dev_t dev, int minor, int type)
     }
 
     /* Check if the device node exists and create it if necessary. */
-    if (stat(buf, &st)) {
+    if (stat(buf, &st))
+    {
         if (!isroot)
             return DRM_ERR_NOT_ROOT;
         remove(buf);
         mknod(buf, S_IFCHR | devmode, dev);
     }
 
-    if (drm_server_info && drm_server_info->get_perms) {
+    if (drm_server_info && drm_server_info->get_perms)
+    {
         group = ((int)serv_group >= 0) ? serv_group : DRM_DEV_GID;
         chown_check_return(buf, user, group);
         chmod(buf, devmode);
@@ -828,8 +889,9 @@ static int drmOpenDevice(dev_t dev, int minor, int type)
     /* if we modprobed then wait for udev */
     {
         int udev_count = 0;
-wait_for_udev:
-        if (stat(DRM_DIR_NAME, &st)) {
+    wait_for_udev:
+        if (stat(DRM_DIR_NAME, &st))
+        {
             usleep(20);
             udev_count++;
 
@@ -838,7 +900,8 @@ wait_for_udev:
             goto wait_for_udev;
         }
 
-        if (stat(buf, &st)) {
+        if (stat(buf, &st))
+        {
             usleep(20);
             udev_count++;
 
@@ -859,12 +922,14 @@ wait_for_udev:
     /* Check if the device node is not what we expect it to be, and recreate it
      * and try again if so.
      */
-    if (st.st_rdev != dev) {
+    if (st.st_rdev != dev)
+    {
         if (!isroot)
             return DRM_ERR_NOT_ROOT;
         remove(buf);
         mknod(buf, S_IFCHR | devmode, dev);
-        if (drm_server_info && drm_server_info->get_perms) {
+        if (drm_server_info && drm_server_info->get_perms)
+        {
             chown_check_return(buf, user, group);
             chmod(buf, devmode);
         }
@@ -881,7 +946,6 @@ wait_for_udev:
     return -errno;
 }
 
-
 /**
  * Open the DRM device
  *
@@ -896,7 +960,7 @@ wait_for_udev:
  */
 static int drmOpenMinor(int minor, int create, int type)
 {
-    int  fd;
+    int fd;
     char buf[DRM_NODE_NAME_MAX];
     const char *dev_name = drmGetDeviceName(type);
 
@@ -912,7 +976,6 @@ static int drmOpenMinor(int minor, int create, int type)
     return -errno;
 }
 
-
 /**
  * Determine whether the DRM kernel driver has been loaded.
  *
@@ -926,10 +989,11 @@ static int drmOpenMinor(int minor, int create, int type)
 drm_public int drmAvailable(void)
 {
     drmVersionPtr version;
-    int           retval = 0;
-    int           fd;
+    int retval = 0;
+    int fd;
 
-    if ((fd = drmOpenMinor(0, 1, DRM_NODE_PRIMARY)) < 0) {
+    if ((fd = drmOpenMinor(0, 1, DRM_NODE_PRIMARY)) < 0)
+    {
 #ifdef __linux__
         /* Try proc for backward Linux compatibility */
         if (!access("/proc/dri/0", R_OK))
@@ -938,7 +1002,8 @@ drm_public int drmAvailable(void)
         return 0;
     }
 
-    if ((version = drmGetVersion(fd))) {
+    if ((version = drmGetVersion(fd)))
+    {
         retval = 1;
         drmFreeVersion(version);
     }
@@ -949,7 +1014,8 @@ drm_public int drmAvailable(void)
 
 static int drmGetMinorBase(int type)
 {
-    switch (type) {
+    switch (type)
+    {
     case DRM_NODE_PRIMARY:
         return 0;
     case DRM_NODE_CONTROL:
@@ -970,14 +1036,15 @@ static int drmGetMinorType(int major, int minor)
     if (!devname_r(makedev(major, minor), S_IFCHR, name, sizeof(name)))
         return -1;
 
-    if (sscanf(name, "drm/%d", &id) != 1) {
+    if (sscanf(name, "drm/%d", &id) != 1)
+    {
         // If not in /dev/drm/ we have the type in the name
         if (sscanf(name, "dri/card%d\n", &id) >= 1)
-           return DRM_NODE_PRIMARY;
+            return DRM_NODE_PRIMARY;
         else if (sscanf(name, "dri/control%d\n", &id) >= 1)
-           return DRM_NODE_CONTROL;
+            return DRM_NODE_CONTROL;
         else if (sscanf(name, "dri/renderD%d\n", &id) >= 1)
-           return DRM_NODE_RENDER;
+            return DRM_NODE_RENDER;
         return -1;
     }
 
@@ -988,7 +1055,8 @@ static int drmGetMinorType(int major, int minor)
     if (minor < 0)
         return -1;
 
-    switch (type) {
+    switch (type)
+    {
     case DRM_NODE_PRIMARY:
     case DRM_NODE_CONTROL:
     case DRM_NODE_RENDER:
@@ -1000,7 +1068,8 @@ static int drmGetMinorType(int major, int minor)
 
 static const char *drmGetMinorName(int type)
 {
-    switch (type) {
+    switch (type)
+    {
     case DRM_NODE_PRIMARY:
         return DRM_PRIMARY_MINOR_NAME;
     case DRM_NODE_CONTROL:
@@ -1028,41 +1097,45 @@ static const char *drmGetMinorName(int type)
  */
 static int drmOpenByBusid(const char *busid, int type)
 {
-    int        i, pci_domain_ok = 1;
-    int        fd;
+    int i, pci_domain_ok = 1;
+    int fd;
     const char *buf;
     drmSetVersion sv;
-    int        base = drmGetMinorBase(type);
+    int base = drmGetMinorBase(type);
 
     if (base < 0)
         return -1;
 
     drmMsg("drmOpenByBusid: Searching for BusID %s\n", busid);
-    for (i = base; i < base + DRM_MAX_MINOR; i++) {
+    for (i = base; i < base + DRM_MAX_MINOR; i++)
+    {
         fd = drmOpenMinor(i, 1, type);
         drmMsg("drmOpenByBusid: drmOpenMinor returns %d\n", fd);
-        if (fd >= 0) {
+        if (fd >= 0)
+        {
             /* We need to try for 1.4 first for proper PCI domain support
              * and if that fails, we know the kernel is busted
              */
             sv.drm_di_major = 1;
             sv.drm_di_minor = 4;
-            sv.drm_dd_major = -1;        /* Don't care */
-            sv.drm_dd_minor = -1;        /* Don't care */
-            if (drmSetInterfaceVersion(fd, &sv)) {
+            sv.drm_dd_major = -1; /* Don't care */
+            sv.drm_dd_minor = -1; /* Don't care */
+            if (drmSetInterfaceVersion(fd, &sv))
+            {
 #ifndef __alpha__
                 pci_domain_ok = 0;
 #endif
                 sv.drm_di_major = 1;
                 sv.drm_di_minor = 1;
-                sv.drm_dd_major = -1;       /* Don't care */
-                sv.drm_dd_minor = -1;       /* Don't care */
+                sv.drm_dd_major = -1; /* Don't care */
+                sv.drm_dd_minor = -1; /* Don't care */
                 drmMsg("drmOpenByBusid: Interface 1.4 failed, trying 1.1\n");
                 drmSetInterfaceVersion(fd, &sv);
             }
             buf = drmGetBusid(fd);
             drmMsg("drmOpenByBusid: drmGetBusid reports %s\n", buf);
-            if (buf && drmMatchBusID(buf, busid, pci_domain_ok)) {
+            if (buf && drmMatchBusID(buf, busid, pci_domain_ok))
+            {
                 drmFreeBusid(buf);
                 return fd;
             }
@@ -1073,7 +1146,6 @@ static int drmOpenByBusid(const char *busid, int type)
     }
     return -1;
 }
-
 
 /**
  * Open the device by name.
@@ -1092,11 +1164,11 @@ static int drmOpenByBusid(const char *busid, int type)
  */
 static int drmOpenByName(const char *name, int type)
 {
-    int           i;
-    int           fd;
+    int i;
+    int fd;
     drmVersionPtr version;
-    char *        id;
-    int           base = drmGetMinorBase(type);
+    char *id;
+    int base = drmGetMinorBase(type);
 
     if (base < 0)
         return -1;
@@ -1105,21 +1177,30 @@ static int drmOpenByName(const char *name, int type)
      * Open the first minor number that matches the driver name and isn't
      * already in use.  If it's in use it will have a busid assigned already.
      */
-    for (i = base; i < base + DRM_MAX_MINOR; i++) {
-        if ((fd = drmOpenMinor(i, 1, type)) >= 0) {
-            if ((version = drmGetVersion(fd))) {
-                if (!strcmp(version->name, name)) {
+    for (i = base; i < base + DRM_MAX_MINOR; i++)
+    {
+        if ((fd = drmOpenMinor(i, 1, type)) >= 0)
+        {
+            if ((version = drmGetVersion(fd)))
+            {
+                if (!strcmp(version->name, name))
+                {
                     drmFreeVersion(version);
                     id = drmGetBusid(fd);
                     drmMsg("drmGetBusid returned '%s'\n", id ? id : "NULL");
-                    if (!id || !*id) {
+                    if (!id || !*id)
+                    {
                         if (id)
                             drmFreeBusid(id);
                         return fd;
-                    } else {
+                    }
+                    else
+                    {
                         drmFreeBusid(id);
                     }
-                } else {
+                }
+                else
+                {
                     drmFreeVersion(version);
                 }
             }
@@ -1129,28 +1210,36 @@ static int drmOpenByName(const char *name, int type)
 
 #ifdef __linux__
     /* Backward-compatibility /proc support */
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++)
+    {
         char proc_name[64], buf[512];
         char *driver, *pt, *devstring;
-        int  retcode;
+        int retcode;
 
         sprintf(proc_name, "/proc/dri/%d/name", i);
-        if ((fd = open(proc_name, O_RDONLY, 0)) >= 0) {
-            retcode = read(fd, buf, sizeof(buf)-1);
+        if ((fd = open(proc_name, O_RDONLY, 0)) >= 0)
+        {
+            retcode = read(fd, buf, sizeof(buf) - 1);
             close(fd);
-            if (retcode) {
-                buf[retcode-1] = '\0';
+            if (retcode)
+            {
+                buf[retcode - 1] = '\0';
                 for (driver = pt = buf; *pt && *pt != ' '; ++pt)
                     ;
-                if (*pt) { /* Device is next */
+                if (*pt)
+                { /* Device is next */
                     *pt = '\0';
-                    if (!strcmp(driver, name)) { /* Match */
+                    if (!strcmp(driver, name))
+                    { /* Match */
                         for (devstring = ++pt; *pt && *pt != ' '; ++pt)
                             ;
-                        if (*pt) { /* Found busid */
+                        if (*pt)
+                        { /* Found busid */
                             return drmOpenByBusid(++pt, type);
-                        } else { /* No busid */
-                            return drmOpenDevice(strtol(devstring, NULL, 0),i, type);
+                        }
+                        else
+                        { /* No busid */
+                            return drmOpenDevice(strtol(devstring, NULL, 0), i, type);
                         }
                     }
                 }
@@ -1161,7 +1250,6 @@ static int drmOpenByName(const char *name, int type)
 
     return -1;
 }
-
 
 /**
  * Open the DRM device.
@@ -1202,15 +1290,18 @@ drm_public int drmOpen(const char *name, const char *busid)
 drm_public int drmOpenWithType(const char *name, const char *busid, int type)
 {
     if (name != NULL && drm_server_info &&
-        drm_server_info->load_module && !drmAvailable()) {
+        drm_server_info->load_module && !drmAvailable())
+    {
         /* try to load the kernel module */
-        if (!drm_server_info->load_module(name)) {
+        if (!drm_server_info->load_module(name))
+        {
             drmMsg("[drm] failed to load kernel module \"%s\"\n", name);
             return -1;
         }
     }
 
-    if (busid) {
+    if (busid)
+    {
         int fd = drmOpenByBusid(busid, type);
         if (fd >= 0)
             return fd;
@@ -1251,7 +1342,6 @@ drm_public void drmFreeVersion(drmVersionPtr v)
     drmFree(v);
 }
 
-
 /**
  * Free the non-public version information returned by the kernel.
  *
@@ -1271,7 +1361,6 @@ static void drmFreeKernelVersion(drm_version_t *v)
     drmFree(v);
 }
 
-
 /**
  * Copy version information.
  *
@@ -1284,17 +1373,16 @@ static void drmFreeKernelVersion(drm_version_t *v)
  */
 static void drmCopyVersion(drmVersionPtr d, const drm_version_t *s)
 {
-    d->version_major      = s->version_major;
-    d->version_minor      = s->version_minor;
+    d->version_major = s->version_major;
+    d->version_minor = s->version_minor;
     d->version_patchlevel = s->version_patchlevel;
-    d->name_len           = s->name_len;
-    d->name               = strdup(s->name);
-    d->date_len           = s->date_len;
-    d->date               = strdup(s->date);
-    d->desc_len           = s->desc_len;
-    d->desc               = strdup(s->desc);
+    d->name_len = s->name_len;
+    d->name = strdup(s->name);
+    d->date_len = s->date_len;
+    d->date = strdup(s->date);
+    d->desc_len = s->desc_len;
+    d->desc = strdup(s->desc);
 }
-
 
 /**
  * Query the driver version information.
@@ -1316,35 +1404,39 @@ drm_public drmVersionPtr drmGetVersion(int fd)
     drmVersionPtr retval;
     drm_version_t *version = drmMalloc(sizeof(*version));
 
-    if (drmIoctl(fd, DRM_IOCTL_VERSION, version)) {
+    if (drmIoctl(fd, DRM_IOCTL_VERSION, version))
+    {
         drmFreeKernelVersion(version);
         return NULL;
     }
 
     if (version->name_len)
-        version->name    = drmMalloc(version->name_len + 1);
+        version->name = drmMalloc(version->name_len + 1);
     if (version->date_len)
-        version->date    = drmMalloc(version->date_len + 1);
+        version->date = drmMalloc(version->date_len + 1);
     if (version->desc_len)
-        version->desc    = drmMalloc(version->desc_len + 1);
+        version->desc = drmMalloc(version->desc_len + 1);
 
-    if (drmIoctl(fd, DRM_IOCTL_VERSION, version)) {
+    if (drmIoctl(fd, DRM_IOCTL_VERSION, version))
+    {
         drmMsg("DRM_IOCTL_VERSION: %s\n", strerror(errno));
         drmFreeKernelVersion(version);
         return NULL;
     }
 
     /* The results might not be null-terminated strings, so terminate them. */
-    if (version->name_len) version->name[version->name_len] = '\0';
-    if (version->date_len) version->date[version->date_len] = '\0';
-    if (version->desc_len) version->desc[version->desc_len] = '\0';
+    if (version->name_len)
+        version->name[version->name_len] = '\0';
+    if (version->date_len)
+        version->date[version->date_len] = '\0';
+    if (version->desc_len)
+        version->desc[version->desc_len] = '\0';
 
     retval = drmMalloc(sizeof(*retval));
     drmCopyVersion(retval, version);
     drmFreeKernelVersion(version);
     return retval;
 }
-
 
 /**
  * Get version information for the DRM user space library.
@@ -1373,8 +1465,8 @@ drm_public drmVersionPtr drmGetLibVersion(int fd)
      *                    modified drmOpen to handle both busid and name
      *   revision 1.3.x = added server + memory manager
      */
-    version->version_major      = 1;
-    version->version_minor      = 3;
+    version->version_major = 1;
+    version->version_minor = 3;
     version->version_patchlevel = 0;
 
     return (drmVersionPtr)version;
@@ -1420,7 +1512,6 @@ drm_public void drmFreeBusid(const char *busid)
     drmFree((void *)busid);
 }
 
-
 /**
  * Get the bus ID of the device.
  *
@@ -1442,7 +1533,8 @@ drm_public char *drmGetBusid(int fd)
     if (drmIoctl(fd, DRM_IOCTL_GET_UNIQUE, &u))
         return NULL;
     u.unique = drmMalloc(u.unique_len + 1);
-    if (drmIoctl(fd, DRM_IOCTL_GET_UNIQUE, &u)) {
+    if (drmIoctl(fd, DRM_IOCTL_GET_UNIQUE, &u))
+    {
         drmFree(u.unique);
         return NULL;
     }
@@ -1450,7 +1542,6 @@ drm_public char *drmGetBusid(int fd)
 
     return u.unique;
 }
-
 
 /**
  * Set the bus ID of the device.
@@ -1469,16 +1560,17 @@ drm_public int drmSetBusid(int fd, const char *busid)
     drm_unique_t u;
 
     memclear(u);
-    u.unique     = (char *)busid;
+    u.unique = (char *)busid;
     u.unique_len = strlen(busid);
 
-    if (drmIoctl(fd, DRM_IOCTL_SET_UNIQUE, &u)) {
+    if (drmIoctl(fd, DRM_IOCTL_SET_UNIQUE, &u))
+    {
         return -errno;
     }
     return 0;
 }
 
-drm_public int drmGetMagic(int fd, drm_magic_t * magic)
+drm_public int drmGetMagic(int fd, drm_magic_t *magic)
 {
     drm_auth_t auth;
 
@@ -1558,10 +1650,10 @@ drm_public int drmAddMap(int fd, drm_handle_t offset, drmSize size, drmMapType t
     drm_map_t map;
 
     memclear(map);
-    map.offset  = offset;
-    map.size    = size;
-    map.type    = (enum drm_map_type)type;
-    map.flags   = (enum drm_map_flags)flags;
+    map.offset = offset;
+    map.size = size;
+    map.type = (enum drm_map_type)type;
+    map.flags = (enum drm_map_flags)flags;
     if (drmIoctl(fd, DRM_IOCTL_ADD_MAP, &map))
         return -errno;
     if (handle)
@@ -1576,7 +1668,7 @@ drm_public int drmRmMap(int fd, drm_handle_t handle)
     memclear(map);
     map.handle = (void *)(uintptr_t)handle;
 
-    if(drmIoctl(fd, DRM_IOCTL_RM_MAP, &map))
+    if (drmIoctl(fd, DRM_IOCTL_RM_MAP, &map))
         return -errno;
     return 0;
 }
@@ -1603,9 +1695,9 @@ drm_public int drmAddBufs(int fd, int count, int size, drmBufDescFlags flags,
     drm_buf_desc_t request;
 
     memclear(request);
-    request.count     = count;
-    request.size      = size;
-    request.flags     = (int)flags;
+    request.count = count;
+    request.size = size;
+    request.flags = (int)flags;
     request.agp_start = agp_offset;
 
     if (drmIoctl(fd, DRM_IOCTL_ADD_BUFS, &request))
@@ -1616,7 +1708,7 @@ drm_public int drmAddBufs(int fd, int count, int size, drmBufDescFlags flags,
 drm_public int drmMarkBufs(int fd, double low, double high)
 {
     drm_buf_info_t info;
-    int            i;
+    int i;
 
     memclear(info);
 
@@ -1629,16 +1721,19 @@ drm_public int drmMarkBufs(int fd, double low, double high)
     if (!(info.list = drmMalloc(info.count * sizeof(*info.list))))
         return -ENOMEM;
 
-    if (drmIoctl(fd, DRM_IOCTL_INFO_BUFS, &info)) {
+    if (drmIoctl(fd, DRM_IOCTL_INFO_BUFS, &info))
+    {
         int retval = -errno;
         drmFree(info.list);
         return retval;
     }
 
-    for (i = 0; i < info.count; i++) {
-        info.list[i].low_mark  = low  * info.list[i].count;
+    for (i = 0; i < info.count; i++)
+    {
+        info.list[i].low_mark = low * info.list[i].count;
         info.list[i].high_mark = high * info.list[i].count;
-        if (drmIoctl(fd, DRM_IOCTL_MARK_BUFS, &info.list[i])) {
+        if (drmIoctl(fd, DRM_IOCTL_MARK_BUFS, &info.list[i]))
+        {
             int retval = -errno;
             drmFree(info.list);
             return retval;
@@ -1670,12 +1765,11 @@ drm_public int drmFreeBufs(int fd, int count, int *list)
 
     memclear(request);
     request.count = count;
-    request.list  = list;
+    request.list = list;
     if (drmIoctl(fd, DRM_IOCTL_FREE_BUFS, &request))
         return -errno;
     return 0;
 }
-
 
 /**
  * Close the device.
@@ -1687,12 +1781,12 @@ drm_public int drmFreeBufs(int fd, int count, int *list)
  */
 drm_public int drmClose(int fd)
 {
-    unsigned long key    = drmGetKeyFromFd(fd);
-    drmHashEntry  *entry = drmGetEntry(fd);
+    unsigned long key = drmGetKeyFromFd(fd);
+    drmHashEntry *entry = drmGetEntry(fd);
 
     drmHashDestroy(entry->tagTable);
-    entry->fd       = 0;
-    entry->f        = NULL;
+    entry->fd = 0;
+    entry->f = NULL;
     entry->tagTable = NULL;
 
     drmHashDelete(drmHashTable, key);
@@ -1700,7 +1794,6 @@ drm_public int drmClose(int fd)
 
     return close(fd);
 }
-
 
 /**
  * Map a region of memory.
@@ -1729,12 +1822,11 @@ drm_public int drmMap(int fd, drm_handle_t handle, drmSize size,
 
     size = (size + pagesize_mask) & ~pagesize_mask;
 
-    *address = drm_mmap(0, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, handle);
+    *address = drm_mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, handle);
     if (*address == MAP_FAILED)
         return -errno;
     return 0;
 }
-
 
 /**
  * Unmap mappings obtained with drmMap().
@@ -1755,35 +1847,39 @@ drm_public int drmUnmap(drmAddress address, drmSize size)
 drm_public drmBufInfoPtr drmGetBufInfo(int fd)
 {
     drm_buf_info_t info;
-    drmBufInfoPtr  retval;
-    int            i;
+    drmBufInfoPtr retval;
+    int i;
 
     memclear(info);
 
     if (drmIoctl(fd, DRM_IOCTL_INFO_BUFS, &info))
         return NULL;
 
-    if (info.count) {
+    if (info.count)
+    {
         if (!(info.list = drmMalloc(info.count * sizeof(*info.list))))
             return NULL;
 
-        if (drmIoctl(fd, DRM_IOCTL_INFO_BUFS, &info)) {
+        if (drmIoctl(fd, DRM_IOCTL_INFO_BUFS, &info))
+        {
             drmFree(info.list);
             return NULL;
         }
 
         retval = drmMalloc(sizeof(*retval));
         retval->count = info.count;
-        if (!(retval->list = drmMalloc(info.count * sizeof(*retval->list)))) {
-                drmFree(retval);
-                drmFree(info.list);
-                return NULL;
+        if (!(retval->list = drmMalloc(info.count * sizeof(*retval->list))))
+        {
+            drmFree(retval);
+            drmFree(info.list);
+            return NULL;
         }
 
-        for (i = 0; i < info.count; i++) {
-            retval->list[i].count     = info.list[i].count;
-            retval->list[i].size      = info.list[i].size;
-            retval->list[i].low_mark  = info.list[i].low_mark;
+        for (i = 0; i < info.count; i++)
+        {
+            retval->list[i].count = info.list[i].count;
+            retval->list[i].size = info.list[i].size;
+            retval->list[i].low_mark = info.list[i].low_mark;
             retval->list[i].high_mark = info.list[i].high_mark;
         }
         drmFree(info.list);
@@ -1810,8 +1906,8 @@ drm_public drmBufInfoPtr drmGetBufInfo(int fd)
 drm_public drmBufMapPtr drmMapBufs(int fd)
 {
     drm_buf_map_t bufs;
-    drmBufMapPtr  retval;
-    int           i;
+    drmBufMapPtr retval;
+    int i;
 
     memclear(bufs);
     if (drmIoctl(fd, DRM_IOCTL_MAP_BUFS, &bufs))
@@ -1823,25 +1919,26 @@ drm_public drmBufMapPtr drmMapBufs(int fd)
     if (!(bufs.list = drmMalloc(bufs.count * sizeof(*bufs.list))))
         return NULL;
 
-    if (drmIoctl(fd, DRM_IOCTL_MAP_BUFS, &bufs)) {
+    if (drmIoctl(fd, DRM_IOCTL_MAP_BUFS, &bufs))
+    {
         drmFree(bufs.list);
         return NULL;
     }
 
     retval = drmMalloc(sizeof(*retval));
     retval->count = bufs.count;
-    retval->list  = drmMalloc(bufs.count * sizeof(*retval->list));
-    for (i = 0; i < bufs.count; i++) {
-        retval->list[i].idx     = bufs.list[i].idx;
-        retval->list[i].total   = bufs.list[i].total;
-        retval->list[i].used    = 0;
+    retval->list = drmMalloc(bufs.count * sizeof(*retval->list));
+    for (i = 0; i < bufs.count; i++)
+    {
+        retval->list[i].idx = bufs.list[i].idx;
+        retval->list[i].total = bufs.list[i].total;
+        retval->list[i].used = 0;
         retval->list[i].address = bufs.list[i].address;
     }
 
     drmFree(bufs.list);
     return retval;
 }
-
 
 /**
  * Unmap buffers allocated with drmMapBufs().
@@ -1856,7 +1953,8 @@ drm_public int drmUnmapBufs(drmBufMapPtr bufs)
 {
     int i;
 
-    for (i = 0; i < bufs->count; i++) {
+    for (i = 0; i < bufs->count; i++)
+    {
         drm_munmap(bufs->list[i].address, bufs->list[i].total);
     }
 
@@ -1865,8 +1963,7 @@ drm_public int drmUnmapBufs(drmBufMapPtr bufs)
     return 0;
 }
 
-
-#define DRM_DMA_RETRY  16
+#define DRM_DMA_RETRY 16
 
 /**
  * Reserve DMA buffers.
@@ -1885,29 +1982,32 @@ drm_public int drmDMA(int fd, drmDMAReqPtr request)
     drm_dma_t dma;
     int ret, i = 0;
 
-    dma.context         = request->context;
-    dma.send_count      = request->send_count;
-    dma.send_indices    = request->send_list;
-    dma.send_sizes      = request->send_sizes;
-    dma.flags           = (enum drm_dma_flags)request->flags;
-    dma.request_count   = request->request_count;
-    dma.request_size    = request->request_size;
+    dma.context = request->context;
+    dma.send_count = request->send_count;
+    dma.send_indices = request->send_list;
+    dma.send_sizes = request->send_sizes;
+    dma.flags = (enum drm_dma_flags)request->flags;
+    dma.request_count = request->request_count;
+    dma.request_size = request->request_size;
     dma.request_indices = request->request_list;
-    dma.request_sizes   = request->request_sizes;
-    dma.granted_count   = 0;
+    dma.request_sizes = request->request_sizes;
+    dma.granted_count = 0;
 
-    do {
-        ret = ioctl( fd, DRM_IOCTL_DMA, &dma );
-    } while ( ret && errno == EAGAIN && i++ < DRM_DMA_RETRY );
+    do
+    {
+        ret = ioctl(fd, DRM_IOCTL_DMA, &dma);
+    } while (ret && errno == EAGAIN && i++ < DRM_DMA_RETRY);
 
-    if ( ret == 0 ) {
+    if (ret == 0)
+    {
         request->granted_count = dma.granted_count;
         return 0;
-    } else {
+    }
+    else
+    {
         return -errno;
     }
 }
-
 
 /**
  * Obtain heavyweight hardware lock.
@@ -1929,13 +2029,19 @@ drm_public int drmGetLock(int fd, drm_context_t context, drmLockFlags flags)
 
     memclear(lock);
     lock.context = context;
-    lock.flags   = 0;
-    if (flags & DRM_LOCK_READY)      lock.flags |= _DRM_LOCK_READY;
-    if (flags & DRM_LOCK_QUIESCENT)  lock.flags |= _DRM_LOCK_QUIESCENT;
-    if (flags & DRM_LOCK_FLUSH)      lock.flags |= _DRM_LOCK_FLUSH;
-    if (flags & DRM_LOCK_FLUSH_ALL)  lock.flags |= _DRM_LOCK_FLUSH_ALL;
-    if (flags & DRM_HALT_ALL_QUEUES) lock.flags |= _DRM_HALT_ALL_QUEUES;
-    if (flags & DRM_HALT_CUR_QUEUES) lock.flags |= _DRM_HALT_CUR_QUEUES;
+    lock.flags = 0;
+    if (flags & DRM_LOCK_READY)
+        lock.flags |= _DRM_LOCK_READY;
+    if (flags & DRM_LOCK_QUIESCENT)
+        lock.flags |= _DRM_LOCK_QUIESCENT;
+    if (flags & DRM_LOCK_FLUSH)
+        lock.flags |= _DRM_LOCK_FLUSH;
+    if (flags & DRM_LOCK_FLUSH_ALL)
+        lock.flags |= _DRM_LOCK_FLUSH_ALL;
+    if (flags & DRM_HALT_ALL_QUEUES)
+        lock.flags |= _DRM_HALT_ALL_QUEUES;
+    if (flags & DRM_HALT_CUR_QUEUES)
+        lock.flags |= _DRM_HALT_CUR_QUEUES;
 
     while (drmIoctl(fd, DRM_IOCTL_LOCK, &lock))
         ;
@@ -1966,9 +2072,9 @@ drm_public int drmUnlock(int fd, drm_context_t context)
 drm_public drm_context_t *drmGetReservedContextList(int fd, int *count)
 {
     drm_ctx_res_t res;
-    drm_ctx_t     *list;
-    drm_context_t * retval;
-    int           i;
+    drm_ctx_t *list;
+    drm_context_t *retval;
+    int i;
 
     memclear(res);
     if (drmIoctl(fd, DRM_IOCTL_RES_CTX, &res))
@@ -1977,7 +2083,7 @@ drm_public drm_context_t *drmGetReservedContextList(int fd, int *count)
     if (!res.count)
         return NULL;
 
-    if (!(list   = drmMalloc(res.count * sizeof(*list))))
+    if (!(list = drmMalloc(res.count * sizeof(*list))))
         return NULL;
     if (!(retval = drmMalloc(res.count * sizeof(*retval))))
         goto err_free_list;
@@ -2211,7 +2317,6 @@ drm_public int drmAgpAcquire(int fd)
     return 0;
 }
 
-
 /**
  * Release the AGP device.
  *
@@ -2228,7 +2333,6 @@ drm_public int drmAgpRelease(int fd)
         return -errno;
     return 0;
 }
-
 
 /**
  * Set the AGP mode.
@@ -2253,7 +2357,6 @@ drm_public int drmAgpEnable(int fd, unsigned long mode)
     return 0;
 }
 
-
 /**
  * Allocate a chunk of AGP memory.
  *
@@ -2277,8 +2380,8 @@ drm_public int drmAgpAlloc(int fd, unsigned long size, unsigned long type,
 
     memclear(b);
     *handle = DRM_AGP_NO_HANDLE;
-    b.size   = size;
-    b.type   = type;
+    b.size = size;
+    b.type = type;
     if (drmIoctl(fd, DRM_IOCTL_AGP_ALLOC, &b))
         return -errno;
     if (address != 0UL)
@@ -2286,7 +2389,6 @@ drm_public int drmAgpAlloc(int fd, unsigned long size, unsigned long type,
     *handle = b.handle;
     return 0;
 }
-
 
 /**
  * Free a chunk of AGP memory.
@@ -2310,7 +2412,6 @@ drm_public int drmAgpFree(int fd, drm_handle_t handle)
         return -errno;
     return 0;
 }
-
 
 /**
  * Bind a chunk of AGP memory.
@@ -2337,7 +2438,6 @@ drm_public int drmAgpBind(int fd, drm_handle_t handle, unsigned long offset)
     return 0;
 }
 
-
 /**
  * Unbind a chunk of AGP memory.
  *
@@ -2361,7 +2461,6 @@ drm_public int drmAgpUnbind(int fd, drm_handle_t handle)
     return 0;
 }
 
-
 /**
  * Get AGP driver major version number.
  *
@@ -2383,7 +2482,6 @@ drm_public int drmAgpVersionMajor(int fd)
         return -errno;
     return i.agp_version_major;
 }
-
 
 /**
  * Get AGP driver minor version number.
@@ -2407,7 +2505,6 @@ drm_public int drmAgpVersionMinor(int fd)
     return i.agp_version_minor;
 }
 
-
 /**
  * Get AGP mode.
  *
@@ -2429,7 +2526,6 @@ drm_public unsigned long drmAgpGetMode(int fd)
         return 0;
     return i.mode;
 }
-
 
 /**
  * Get AGP aperture base.
@@ -2453,7 +2549,6 @@ drm_public unsigned long drmAgpBase(int fd)
     return i.aperture_base;
 }
 
-
 /**
  * Get AGP aperture size.
  *
@@ -2475,7 +2570,6 @@ drm_public unsigned long drmAgpSize(int fd)
         return 0;
     return i.aperture_size;
 }
-
 
 /**
  * Get used AGP memory.
@@ -2499,7 +2593,6 @@ drm_public unsigned long drmAgpMemoryUsed(int fd)
     return i.memory_used;
 }
 
-
 /**
  * Get available AGP memory.
  *
@@ -2522,7 +2615,6 @@ drm_public unsigned long drmAgpMemoryAvail(int fd)
     return i.memory_allowed;
 }
 
-
 /**
  * Get hardware vendor ID.
  *
@@ -2544,7 +2636,6 @@ drm_public unsigned int drmAgpVendorId(int fd)
         return 0;
     return i.id_vendor;
 }
-
 
 /**
  * Get hardware device ID.
@@ -2576,7 +2667,7 @@ drm_public int drmScatterGatherAlloc(int fd, unsigned long size,
     memclear(sg);
 
     *handle = 0;
-    sg.size   = size;
+    sg.size = size;
     if (drmIoctl(fd, DRM_IOCTL_SG_ALLOC, &sg))
         return -errno;
     *handle = sg.handle;
@@ -2611,26 +2702,30 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
     int ret;
 
     ret = clock_gettime(CLOCK_MONOTONIC, &timeout);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         fprintf(stderr, "clock_gettime failed: %s\n", strerror(errno));
         goto out;
     }
     timeout.tv_sec++;
 
-    do {
-       ret = ioctl(fd, DRM_IOCTL_WAIT_VBLANK, vbl);
-       vbl->request.type &= ~DRM_VBLANK_RELATIVE;
-       if (ret && errno == EINTR) {
-           clock_gettime(CLOCK_MONOTONIC, &cur);
-           /* Timeout after 1s */
-           if (cur.tv_sec > timeout.tv_sec + 1 ||
-               (cur.tv_sec == timeout.tv_sec && cur.tv_nsec >=
-                timeout.tv_nsec)) {
-                   errno = EBUSY;
-                   ret = -1;
-                   break;
-           }
-       }
+    do
+    {
+        ret = ioctl(fd, DRM_IOCTL_WAIT_VBLANK, vbl);
+        vbl->request.type &= ~DRM_VBLANK_RELATIVE;
+        if (ret && errno == EINTR)
+        {
+            clock_gettime(CLOCK_MONOTONIC, &cur);
+            /* Timeout after 1s */
+            if (cur.tv_sec > timeout.tv_sec + 1 ||
+                (cur.tv_sec == timeout.tv_sec && cur.tv_nsec >=
+                                                     timeout.tv_nsec))
+            {
+                errno = EBUSY;
+                ret = -1;
+                break;
+            }
+        }
     } while (ret && errno == EINTR);
 
 out:
@@ -2639,7 +2734,8 @@ out:
 
 drm_public int drmError(int err, const char *label)
 {
-    switch (err) {
+    switch (err)
+    {
     case DRM_ERR_NO_DEVICE:
         fprintf(stderr, "%s: no device\n", label);
         break;
@@ -2655,7 +2751,7 @@ drm_public int drmError(int err, const char *label)
     default:
         if (err < 0)
             err = -err;
-        fprintf( stderr, "%s: error %d (%s)\n", label, err, strerror(err) );
+        fprintf(stderr, "%s: error %d (%s)\n", label, err, strerror(err));
         break;
     }
 
@@ -2679,13 +2775,12 @@ drm_public int drmCtlInstHandler(int fd, int irq)
     drm_control_t ctl;
 
     memclear(ctl);
-    ctl.func  = DRM_INST_HANDLER;
-    ctl.irq   = irq;
+    ctl.func = DRM_INST_HANDLER;
+    ctl.irq = irq;
     if (drmIoctl(fd, DRM_IOCTL_CONTROL, &ctl))
         return -errno;
     return 0;
 }
-
 
 /**
  * Uninstall IRQ handler.
@@ -2703,8 +2798,8 @@ drm_public int drmCtlUninstHandler(int fd)
     drm_control_t ctl;
 
     memclear(ctl);
-    ctl.func  = DRM_UNINST_HANDLER;
-    ctl.irq   = 0;
+    ctl.func = DRM_UNINST_HANDLER;
+    ctl.irq = 0;
     if (drmIoctl(fd, DRM_IOCTL_CONTROL, &ctl))
         return -errno;
     return 0;
@@ -2716,12 +2811,18 @@ drm_public int drmFinish(int fd, int context, drmLockFlags flags)
 
     memclear(lock);
     lock.context = context;
-    if (flags & DRM_LOCK_READY)      lock.flags |= _DRM_LOCK_READY;
-    if (flags & DRM_LOCK_QUIESCENT)  lock.flags |= _DRM_LOCK_QUIESCENT;
-    if (flags & DRM_LOCK_FLUSH)      lock.flags |= _DRM_LOCK_FLUSH;
-    if (flags & DRM_LOCK_FLUSH_ALL)  lock.flags |= _DRM_LOCK_FLUSH_ALL;
-    if (flags & DRM_HALT_ALL_QUEUES) lock.flags |= _DRM_HALT_ALL_QUEUES;
-    if (flags & DRM_HALT_CUR_QUEUES) lock.flags |= _DRM_HALT_CUR_QUEUES;
+    if (flags & DRM_LOCK_READY)
+        lock.flags |= _DRM_LOCK_READY;
+    if (flags & DRM_LOCK_QUIESCENT)
+        lock.flags |= _DRM_LOCK_QUIESCENT;
+    if (flags & DRM_LOCK_FLUSH)
+        lock.flags |= _DRM_LOCK_FLUSH;
+    if (flags & DRM_LOCK_FLUSH_ALL)
+        lock.flags |= _DRM_LOCK_FLUSH_ALL;
+    if (flags & DRM_HALT_ALL_QUEUES)
+        lock.flags |= _DRM_HALT_ALL_QUEUES;
+    if (flags & DRM_HALT_CUR_QUEUES)
+        lock.flags |= _DRM_HALT_CUR_QUEUES;
     if (drmIoctl(fd, DRM_IOCTL_FINISH, &lock))
         return -errno;
     return 0;
@@ -2747,8 +2848,8 @@ drm_public int drmGetInterruptFromBusID(int fd, int busnum, int devnum,
     drm_irq_busid_t p;
 
     memclear(p);
-    p.busnum  = busnum;
-    p.devnum  = devnum;
+    p.busnum = busnum;
+    p.devnum = devnum;
     p.funcnum = funcnum;
     if (drmIoctl(fd, DRM_IOCTL_IRQ_BUSID, &p))
         return -errno;
@@ -2757,9 +2858,10 @@ drm_public int drmGetInterruptFromBusID(int fd, int busnum, int devnum,
 
 drm_public int drmAddContextTag(int fd, drm_context_t context, void *tag)
 {
-    drmHashEntry  *entry = drmGetEntry(fd);
+    drmHashEntry *entry = drmGetEntry(fd);
 
-    if (drmHashInsert(entry->tagTable, context, tag)) {
+    if (drmHashInsert(entry->tagTable, context, tag))
+    {
         drmHashDelete(entry->tagTable, context);
         drmHashInsert(entry->tagTable, context, tag);
     }
@@ -2768,15 +2870,15 @@ drm_public int drmAddContextTag(int fd, drm_context_t context, void *tag)
 
 drm_public int drmDelContextTag(int fd, drm_context_t context)
 {
-    drmHashEntry  *entry = drmGetEntry(fd);
+    drmHashEntry *entry = drmGetEntry(fd);
 
     return drmHashDelete(entry->tagTable, context);
 }
 
 drm_public void *drmGetContextTag(int fd, drm_context_t context)
 {
-    drmHashEntry  *entry = drmGetEntry(fd);
-    void          *value;
+    drmHashEntry *entry = drmGetEntry(fd);
+    void *value;
 
     if (drmHashLookup(entry->tagTable, context, &value))
         return NULL;
@@ -2825,11 +2927,11 @@ drm_public int drmGetMap(int fd, int idx, drm_handle_t *offset, drmSize *size,
     if (drmIoctl(fd, DRM_IOCTL_GET_MAP, &map))
         return -errno;
     *offset = map.offset;
-    *size   = map.size;
-    *type   = (drmMapType)map.type;
-    *flags  = (drmMapFlags)map.flags;
+    *size = map.size;
+    *type = (drmMapType)map.type;
+    *flags = (drmMapFlags)map.flags;
     *handle = (unsigned long)map.handle;
-    *mtrr   = map.mtrr;
+    *mtrr = map.mtrr;
     return 0;
 }
 
@@ -2842,18 +2944,18 @@ drm_public int drmGetClient(int fd, int idx, int *auth, int *pid, int *uid,
     client.idx = idx;
     if (drmIoctl(fd, DRM_IOCTL_GET_CLIENT, &client))
         return -errno;
-    *auth      = client.auth;
-    *pid       = client.pid;
-    *uid       = client.uid;
-    *magic     = client.magic;
-    *iocs      = client.iocs;
+    *auth = client.auth;
+    *pid = client.pid;
+    *uid = client.uid;
+    *magic = client.magic;
+    *iocs = client.iocs;
     return 0;
 }
 
 drm_public int drmGetStats(int fd, drmStatsT *stats)
 {
     drm_stats_t s;
-    unsigned    i;
+    unsigned i;
 
     memclear(s);
     if (drmIoctl(fd, DRM_IOCTL_GET_STATS, &s))
@@ -2861,36 +2963,37 @@ drm_public int drmGetStats(int fd, drmStatsT *stats)
 
     stats->count = 0;
     memset(stats, 0, sizeof(*stats));
-    if (s.count > sizeof(stats->data)/sizeof(stats->data[0]))
+    if (s.count > sizeof(stats->data) / sizeof(stats->data[0]))
         return -1;
 
-#define SET_VALUE                              \
-    stats->data[i].long_format = "%-20.20s";   \
-    stats->data[i].rate_format = "%8.8s";      \
-    stats->data[i].isvalue     = 1;            \
-    stats->data[i].verbose     = 0
+#define SET_VALUE                            \
+    stats->data[i].long_format = "%-20.20s"; \
+    stats->data[i].rate_format = "%8.8s";    \
+    stats->data[i].isvalue = 1;              \
+    stats->data[i].verbose = 0
 
-#define SET_COUNT                              \
-    stats->data[i].long_format = "%-20.20s";   \
-    stats->data[i].rate_format = "%5.5s";      \
-    stats->data[i].isvalue     = 0;            \
-    stats->data[i].mult_names  = "kgm";        \
-    stats->data[i].mult        = 1000;         \
-    stats->data[i].verbose     = 0
+#define SET_COUNT                            \
+    stats->data[i].long_format = "%-20.20s"; \
+    stats->data[i].rate_format = "%5.5s";    \
+    stats->data[i].isvalue = 0;              \
+    stats->data[i].mult_names = "kgm";       \
+    stats->data[i].mult = 1000;              \
+    stats->data[i].verbose = 0
 
-#define SET_BYTE                               \
-    stats->data[i].long_format = "%-20.20s";   \
-    stats->data[i].rate_format = "%5.5s";      \
-    stats->data[i].isvalue     = 0;            \
-    stats->data[i].mult_names  = "KGM";        \
-    stats->data[i].mult        = 1024;         \
-    stats->data[i].verbose     = 0
-
+#define SET_BYTE                             \
+    stats->data[i].long_format = "%-20.20s"; \
+    stats->data[i].rate_format = "%5.5s";    \
+    stats->data[i].isvalue = 0;              \
+    stats->data[i].mult_names = "KGM";       \
+    stats->data[i].mult = 1024;              \
+    stats->data[i].verbose = 0
 
     stats->count = s.count;
-    for (i = 0; i < s.count; i++) {
+    for (i = 0; i < s.count; i++)
+    {
         stats->data[i].value = s.data[i].value;
-        switch (s.data[i].type) {
+        switch (s.data[i].type)
+        {
         case _DRM_STAT_LOCK:
             stats->data[i].long_name = "Lock";
             stats->data[i].rate_name = "Lock";
@@ -2900,13 +3003,13 @@ drm_public int drmGetStats(int fd, drmStatsT *stats)
             stats->data[i].long_name = "Opens";
             stats->data[i].rate_name = "O";
             SET_COUNT;
-            stats->data[i].verbose   = 1;
+            stats->data[i].verbose = 1;
             break;
         case _DRM_STAT_CLOSES:
             stats->data[i].long_name = "Closes";
             stats->data[i].rate_name = "Lock";
             SET_COUNT;
-            stats->data[i].verbose   = 1;
+            stats->data[i].verbose = 1;
             break;
         case _DRM_STAT_IOCTLS:
             stats->data[i].long_name = "Ioctls";
@@ -2999,7 +3102,8 @@ drm_public int drmSetInterfaceVersion(int fd, drmSetVersion *version)
     sv.drm_dd_major = version->drm_dd_major;
     sv.drm_dd_minor = version->drm_dd_minor;
 
-    if (drmIoctl(fd, DRM_IOCTL_SET_VERSION, &sv)) {
+    if (drmIoctl(fd, DRM_IOCTL_SET_VERSION, &sv))
+    {
         retcode = -errno;
     }
 
@@ -3027,14 +3131,14 @@ drm_public int drmCommandNone(int fd, unsigned long drmCommandIndex)
 {
     unsigned long request;
 
-    request = DRM_IO( DRM_COMMAND_BASE + drmCommandIndex);
+    request = DRM_IO(DRM_COMMAND_BASE + drmCommandIndex);
 
-    if (drmIoctl(fd, request, NULL)) {
+    if (drmIoctl(fd, request, NULL))
+    {
         return -errno;
     }
     return 0;
 }
-
 
 /**
  * Send a device-specific read command.
@@ -3055,15 +3159,15 @@ drm_public int drmCommandRead(int fd, unsigned long drmCommandIndex,
 {
     unsigned long request;
 
-    request = DRM_IOC( DRM_IOC_READ, DRM_IOCTL_BASE,
-        DRM_COMMAND_BASE + drmCommandIndex, size);
+    request = DRM_IOC(DRM_IOC_READ, DRM_IOCTL_BASE,
+                      DRM_COMMAND_BASE + drmCommandIndex, size);
 
-    if (drmIoctl(fd, request, data)) {
+    if (drmIoctl(fd, request, data))
+    {
         return -errno;
     }
     return 0;
 }
-
 
 /**
  * Send a device-specific write command.
@@ -3084,15 +3188,15 @@ drm_public int drmCommandWrite(int fd, unsigned long drmCommandIndex,
 {
     unsigned long request;
 
-    request = DRM_IOC( DRM_IOC_WRITE, DRM_IOCTL_BASE,
-        DRM_COMMAND_BASE + drmCommandIndex, size);
+    request = DRM_IOC(DRM_IOC_WRITE, DRM_IOCTL_BASE,
+                      DRM_COMMAND_BASE + drmCommandIndex, size);
 
-    if (drmIoctl(fd, request, data)) {
+    if (drmIoctl(fd, request, data))
+    {
         return -errno;
     }
     return 0;
 }
-
 
 /**
  * Send a device-specific read-write command.
@@ -3113,8 +3217,8 @@ drm_public int drmCommandWriteRead(int fd, unsigned long drmCommandIndex,
 {
     unsigned long request;
 
-    request = DRM_IOC( DRM_IOC_READ|DRM_IOC_WRITE, DRM_IOCTL_BASE,
-        DRM_COMMAND_BASE + drmCommandIndex, size);
+    request = DRM_IOC(DRM_IOC_READ | DRM_IOC_WRITE, DRM_IOCTL_BASE,
+                      DRM_COMMAND_BASE + drmCommandIndex, size);
 
     if (drmIoctl(fd, request, data))
         return -errno;
@@ -3122,7 +3226,8 @@ drm_public int drmCommandWriteRead(int fd, unsigned long drmCommandIndex,
 }
 
 #define DRM_MAX_FDS 16
-static struct {
+static struct
+{
     char *BusID;
     int fd;
     int refcount;
@@ -3144,7 +3249,8 @@ drm_public int drmOpenOnceWithType(const char *BusID, int *newlyopened,
 
     for (i = 0; i < nr_fds; i++)
         if ((strcmp(BusID, connection[i].BusID) == 0) &&
-            (connection[i].type == type)) {
+            (connection[i].type == type))
+        {
             connection[i].refcount++;
             *newlyopened = 0;
             return connection[i].fd;
@@ -3174,9 +3280,12 @@ drm_public void drmCloseOnce(int fd)
 {
     int i;
 
-    for (i = 0; i < nr_fds; i++) {
-        if (fd == connection[i].fd) {
-            if (--connection[i].refcount == 0) {
+    for (i = 0; i < nr_fds; i++)
+    {
+        if (fd == connection[i].fd)
+        {
+            if (--connection[i].refcount == 0)
+            {
                 drmClose(connection[i].fd);
                 free(connection[i].BusID);
 
@@ -3191,30 +3300,30 @@ drm_public void drmCloseOnce(int fd)
 
 drm_public int drmSetMaster(int fd)
 {
-        return drmIoctl(fd, DRM_IOCTL_SET_MASTER, NULL);
+    return drmIoctl(fd, DRM_IOCTL_SET_MASTER, NULL);
 }
 
 drm_public int drmDropMaster(int fd)
 {
-        return drmIoctl(fd, DRM_IOCTL_DROP_MASTER, NULL);
+    return drmIoctl(fd, DRM_IOCTL_DROP_MASTER, NULL);
 }
 
 drm_public int drmIsMaster(int fd)
 {
-        /* Detect master by attempting something that requires master.
-         *
-         * Authenticating magic tokens requires master and 0 is an
-         * internal kernel detail which we could use. Attempting this on
-         * a master fd would fail therefore fail with EINVAL because 0
-         * is invalid.
-         *
-         * A non-master fd will fail with EACCES, as the kernel checks
-         * for master before attempting to do anything else.
-         *
-         * Since we don't want to leak implementation details, use
-         * EACCES.
-         */
-        return drmAuthMagic(fd, 0) != -EACCES;
+    /* Detect master by attempting something that requires master.
+     *
+     * Authenticating magic tokens requires master and 0 is an
+     * internal kernel detail which we could use. Attempting this on
+     * a master fd would fail therefore fail with EINVAL because 0
+     * is invalid.
+     *
+     * A non-master fd will fail with EACCES, as the kernel checks
+     * for master before attempting to do anything else.
+     *
+     * Since we don't want to leak implementation details, use
+     * EACCES.
+     */
+    return drmAuthMagic(fd, 0) != -EACCES;
 }
 
 drm_public char *drmGetDeviceNameFromFd(int fd)
@@ -3245,7 +3354,12 @@ drm_public char *drmGetDeviceNameFromFd(int fd)
     fstat(fd, &sbuf);
     d = sbuf.st_rdev;
 
-    for (i = 0; i < DRM_MAX_MINOR; i++) {
+    snprintf(name, sizeof name, "%s", getenv("DRM_DEVICE_PATH"));
+    if (stat(name, &sbuf) == 0 && sbuf.st_rdev == d)
+        return strdup(name);
+
+    for (i = 0; i < DRM_MAX_MINOR; i++)
+    {
         snprintf(name, sizeof name, DRM_DEV_NAME, DRM_DIR_NAME, i);
         if (stat(name, &sbuf) == 0 && sbuf.st_rdev == d)
             break;
@@ -3270,7 +3384,7 @@ static bool drmNodeIsDRM(int maj, int min)
     char name[SPECNAMELEN];
 
     if (!devname_r(makedev(maj, min), S_IFCHR, name, sizeof(name)))
-      return 0;
+        return 0;
     /* Handle drm/ and dri/ as both are present in different FreeBSD version
      * FreeBSD on amd64/i386/powerpc external kernel modules create node in
      * in /dev/drm/ and links in /dev/dri while a WIP in kernel driver creates
@@ -3292,7 +3406,8 @@ drm_public int drmGetNodeTypeFromFd(int fd)
     maj = major(sbuf.st_rdev);
     min = minor(sbuf.st_rdev);
 
-    if (!drmNodeIsDRM(maj, min) || !S_ISCHR(sbuf.st_mode)) {
+    if (!drmNodeIsDRM(maj, min) || !S_ISCHR(sbuf.st_mode))
+    {
         errno = EINVAL;
         return -1;
     }
@@ -3376,10 +3491,12 @@ static char *drmGetMinorNameForFD(int fd, int type)
     if (!sysdir)
         return NULL;
 
-    while ((ent = readdir(sysdir))) {
-        if (strncmp(ent->d_name, name, len) == 0) {
+    while ((ent = readdir(sysdir)))
+    {
+        if (strncmp(ent->d_name, name, len) == 0)
+        {
             if (snprintf(dev_name, sizeof(dev_name), DRM_DIR_NAME "/%s",
-                        ent->d_name) < 0)
+                         ent->d_name) < 0)
                 return NULL;
 
             closedir(sysdir);
@@ -3419,9 +3536,10 @@ static char *drmGetMinorNameForFD(int fd, int type)
         return (NULL);
     mname = drmGetMinorName(type);
 
-    for (i = 0; i < SPECNAMELEN; i++) {
+    for (i = 0; i < SPECNAMELEN; i++)
+    {
         if (isalpha(dname[i]) == 0 && dname[i] != '/')
-           break;
+            break;
     }
     if (dname[i] == '\0')
         return (NULL);
@@ -3429,7 +3547,7 @@ static char *drmGetMinorNameForFD(int fd, int type)
     id = (int)strtol(&dname[i], NULL, 10);
     id -= drmGetMinorBase(nodetype);
     snprintf(name, sizeof(name), DRM_DIR_NAME "/%s%d", mname,
-         id + drmGetMinorBase(type));
+             id + drmGetMinorBase(type));
 
     return strdup(name);
 #else
@@ -3470,8 +3588,8 @@ drm_public char *drmGetRenderDeviceNameFromFd(int fd)
 }
 
 #ifdef __linux__
-static char * DRM_PRINTFLIKE(2, 3)
-sysfs_uevent_get(const char *path, const char *fmt, ...)
+static char *DRM_PRINTFLIKE(2, 3)
+    sysfs_uevent_get(const char *path, const char *fmt, ...)
 {
     char filename[PATH_MAX + 1], *key, *line = NULL, *value = NULL;
     size_t size = 0, len;
@@ -3487,13 +3605,16 @@ sysfs_uevent_get(const char *path, const char *fmt, ...)
     snprintf(filename, sizeof(filename), "%s/uevent", path);
 
     fp = fopen(filename, "r");
-    if (!fp) {
+    if (!fp)
+    {
         free(key);
         return NULL;
     }
 
-    while ((num = getline(&line, &size, fp)) >= 0) {
-        if ((strncmp(line, key, len) == 0) && (line[len] == '=')) {
+    while ((num = getline(&line, &size, fp)) >= 0)
+    {
+        if ((strncmp(line, key, len) == 0) && (line[len] == '='))
+        {
             char *start = line + len + 1, *end = line + num - 1;
 
             if (*end != '\n')
@@ -3522,16 +3643,17 @@ static int get_subsystem_type(const char *device_path)
     char path[PATH_MAX + 1] = "";
     char link[PATH_MAX + 1] = "";
     char *name;
-    struct {
+    struct
+    {
         const char *name;
         int bus_type;
     } bus_types[] = {
-        { "/pci", DRM_BUS_PCI },
-        { "/usb", DRM_BUS_USB },
-        { "/platform", DRM_BUS_PLATFORM },
-        { "/spi", DRM_BUS_PLATFORM },
-        { "/host1x", DRM_BUS_HOST1X },
-        { "/virtio", DRM_BUS_VIRTIO },
+        {"/pci", DRM_BUS_PCI},
+        {"/usb", DRM_BUS_USB},
+        {"/platform", DRM_BUS_PLATFORM},
+        {"/spi", DRM_BUS_PLATFORM},
+        {"/host1x", DRM_BUS_HOST1X},
+        {"/virtio", DRM_BUS_VIRTIO},
     };
 
     strncpy(path, device_path, PATH_MAX);
@@ -3544,7 +3666,8 @@ static int get_subsystem_type(const char *device_path)
     if (!name)
         return -EINVAL;
 
-    for (unsigned i = 0; i < ARRAY_SIZE(bus_types); i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE(bus_types); i++)
+    {
         if (strncmp(name, bus_types[i].name, strlen(bus_types[i].name)) == 0)
             return bus_types[i].bus_type;
     }
@@ -3564,7 +3687,8 @@ static int drmParseSubsystemType(int maj, int min)
 
     subsystem_type = get_subsystem_type(path);
     /* Try to get the parent (underlying) device type */
-    if (subsystem_type == DRM_BUS_VIRTIO) {
+    if (subsystem_type == DRM_BUS_VIRTIO)
+    {
         /* Assume virtio-pci on error */
         if (!realpath(path, real_path))
             return DRM_BUS_VIRTIO;
@@ -3572,7 +3696,7 @@ static int drmParseSubsystemType(int maj, int min)
         subsystem_type = get_subsystem_type(path);
         if (subsystem_type < 0)
             return DRM_BUS_VIRTIO;
-     }
+    }
     return subsystem_type;
 #elif defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD__)
     return DRM_BUS_PCI;
@@ -3589,7 +3713,8 @@ get_pci_path(int maj, int min, char *pci_path)
     char path[PATH_MAX + 1], *term;
 
     snprintf(path, sizeof(path), "/sys/dev/char/%d:%d/device", maj, min);
-    if (!realpath(path, pci_path)) {
+    if (!realpath(path, pci_path))
+    {
         strcpy(pci_path, path);
         return;
     }
@@ -3612,7 +3737,7 @@ static int get_sysctl_pci_bus_info(int maj, int min, drmPciBusInfoPtr info)
 
     rdev = makedev(maj, min);
     if (!devname_r(rdev, S_IFCHR, dname, sizeof(dname)))
-      return -EINVAL;
+        return -EINVAL;
 
     if (sscanf(dname, "drm/%d\n", &id) != 1)
         return -EINVAL;
@@ -3627,30 +3752,31 @@ static int get_sysctl_pci_bus_info(int maj, int min, drmPciBusInfoPtr info)
      * This is a possibility in FreeBSD but for now there is no good way for
      * obtaining the info.
      */
-    switch (type) {
+    switch (type)
+    {
     case DRM_NODE_PRIMARY:
-         break;
+        break;
     case DRM_NODE_CONTROL:
-         id -= 64;
-         break;
+        id -= 64;
+        break;
     case DRM_NODE_RENDER:
-         id -= 128;
-          break;
+        id -= 128;
+        break;
     }
     if (id < 0)
         return -EINVAL;
 
     if (snprintf(sysctl_name, sizeof(sysctl_name), "hw.dri.%d.busid", id) <= 0)
-      return -EINVAL;
+        return -EINVAL;
     sysctl_len = sizeof(sysctl_val);
     if (sysctlbyname(sysctl_name, sysctl_val, &sysctl_len, NULL, 0))
-      return -EINVAL;
+        return -EINVAL;
 
-    #define bus_fmt "pci:%04x:%02x:%02x.%u"
+#define bus_fmt "pci:%04x:%02x:%02x.%u"
 
     nelem = sscanf(sysctl_val, bus_fmt, &domain, &bus, &dev, &func);
     if (nelem != 4)
-      return -EINVAL;
+        return -EINVAL;
     info->domain = domain;
     info->bus = bus;
     info->dev = dev;
@@ -3697,7 +3823,8 @@ static int drmParsePciBusInfo(int maj, int min, drmPciBusInfoPtr info)
     if (fd < 0)
         return -errno;
 
-    if (drmIoctl(fd, DRM_IOCTL_GET_PCIINFO, &pinfo)) {
+    if (drmIoctl(fd, DRM_IOCTL_GET_PCIINFO, &pinfo))
+    {
         close(fd);
         return -errno;
     }
@@ -3725,7 +3852,8 @@ drm_public int drmDevicesEqual(drmDevicePtr a, drmDevicePtr b)
     if (a->bustype != b->bustype)
         return 0;
 
-    switch (a->bustype) {
+    switch (a->bustype)
+    {
     case DRM_BUS_PCI:
         return memcmp(a->businfo.pci, b->businfo.pci, sizeof(drmPciBusInfo)) == 0;
 
@@ -3748,15 +3876,15 @@ drm_public int drmDevicesEqual(drmDevicePtr a, drmDevicePtr b)
 static int drmGetNodeType(const char *name)
 {
     if (strncmp(name, DRM_CONTROL_MINOR_NAME,
-        sizeof(DRM_CONTROL_MINOR_NAME ) - 1) == 0)
+                sizeof(DRM_CONTROL_MINOR_NAME) - 1) == 0)
         return DRM_NODE_CONTROL;
 
     if (strncmp(name, DRM_RENDER_MINOR_NAME,
-        sizeof(DRM_RENDER_MINOR_NAME) - 1) == 0)
+                sizeof(DRM_RENDER_MINOR_NAME) - 1) == 0)
         return DRM_NODE_RENDER;
 
     if (strncmp(name, DRM_PRIMARY_MINOR_NAME,
-        sizeof(DRM_PRIMARY_MINOR_NAME) - 1) == 0)
+                sizeof(DRM_PRIMARY_MINOR_NAME) - 1) == 0)
         return DRM_NODE_PRIMARY;
 
     return -EINVAL;
@@ -3777,11 +3905,11 @@ static int parse_separate_sysfs_files(int maj, int min,
                                       bool ignore_revision)
 {
     static const char *attrs[] = {
-      "revision", /* Older kernels are missing the file, so check for it first */
-      "vendor",
-      "device",
-      "subsystem_vendor",
-      "subsystem_device",
+        "revision", /* Older kernels are missing the file, so check for it first */
+        "vendor",
+        "device",
+        "subsystem_vendor",
+        "subsystem_device",
     };
     char path[PATH_MAX + 1], pci_path[PATH_MAX + 1];
     unsigned int data[ARRAY_SIZE(attrs)];
@@ -3790,7 +3918,8 @@ static int parse_separate_sysfs_files(int maj, int min,
 
     get_pci_path(maj, min, pci_path);
 
-    for (unsigned i = ignore_revision ? 1 : 0; i < ARRAY_SIZE(attrs); i++) {
+    for (unsigned i = ignore_revision ? 1 : 0; i < ARRAY_SIZE(attrs); i++)
+    {
         if (snprintf(path, PATH_MAX, "%s/%s", pci_path, attrs[i]) < 0)
             return -errno;
 
@@ -3802,7 +3931,6 @@ static int parse_separate_sysfs_files(int maj, int min,
         fclose(fp);
         if (ret != 1)
             return -errno;
-
     }
 
     device->revision_id = ignore_revision ? 0xff : data[0] & 0xff;
@@ -3869,7 +3997,8 @@ static int drmParsePciDeviceInfo(int maj, int min,
     if (fd < 0)
         return -errno;
 
-    if (drmIoctl(fd, DRM_IOCTL_GET_PCIINFO, &pinfo)) {
+    if (drmIoctl(fd, DRM_IOCTL_GET_PCIINFO, &pinfo))
+    {
         close(fd);
         return -errno;
     }
@@ -3901,8 +4030,7 @@ static int drmParsePciDeviceInfo(int maj, int min,
     patterns[0].pc_sel.pc_bus = info.bus;
     patterns[0].pc_sel.pc_dev = info.dev;
     patterns[0].pc_sel.pc_func = info.func;
-    patterns[0].flags = PCI_GETCONF_MATCH_DOMAIN | PCI_GETCONF_MATCH_BUS
-                      | PCI_GETCONF_MATCH_DEV | PCI_GETCONF_MATCH_FUNC;
+    patterns[0].flags = PCI_GETCONF_MATCH_DOMAIN | PCI_GETCONF_MATCH_BUS | PCI_GETCONF_MATCH_DEV | PCI_GETCONF_MATCH_FUNC;
     bzero(&pc, sizeof(struct pci_conf_io));
     pc.num_patterns = 1;
     pc.pat_buf_len = sizeof(patterns);
@@ -3910,7 +4038,8 @@ static int drmParsePciDeviceInfo(int maj, int min,
     pc.match_buf_len = sizeof(results);
     pc.matches = results;
 
-    if (ioctl(fd, PCIOCGETCONF, &pc) || pc.status == PCI_GETCONF_ERROR) {
+    if (ioctl(fd, PCIOCGETCONF, &pc) || pc.status == PCI_GETCONF_ERROR)
+    {
         error = errno;
         close(fd);
         return -error;
@@ -3932,11 +4061,14 @@ static int drmParsePciDeviceInfo(int maj, int min,
 
 static void drmFreePlatformDevice(drmDevicePtr device)
 {
-    if (device->deviceinfo.platform) {
-        if (device->deviceinfo.platform->compatible) {
+    if (device->deviceinfo.platform)
+    {
+        if (device->deviceinfo.platform->compatible)
+        {
             char **compatible = device->deviceinfo.platform->compatible;
 
-            while (*compatible) {
+            while (*compatible)
+            {
                 free(*compatible);
                 compatible++;
             }
@@ -3948,11 +4080,14 @@ static void drmFreePlatformDevice(drmDevicePtr device)
 
 static void drmFreeHost1xDevice(drmDevicePtr device)
 {
-    if (device->deviceinfo.host1x) {
-        if (device->deviceinfo.host1x->compatible) {
+    if (device->deviceinfo.host1x)
+    {
+        if (device->deviceinfo.host1x->compatible)
+        {
             char **compatible = device->deviceinfo.host1x->compatible;
 
-            while (*compatible) {
+            while (*compatible)
+            {
                 free(*compatible);
                 compatible++;
             }
@@ -3967,8 +4102,10 @@ drm_public void drmFreeDevice(drmDevicePtr *device)
     if (device == NULL)
         return;
 
-    if (*device) {
-        switch ((*device)->bustype) {
+    if (*device)
+    {
+        switch ((*device)->bustype)
+        {
         case DRM_BUS_PLATFORM:
             drmFreePlatformDevice(*device);
             break;
@@ -4020,7 +4157,8 @@ static drmDevicePtr drmDeviceAlloc(unsigned int type, const char *node,
 
     ptr += DRM_NODE_MAX * sizeof(void *);
 
-    for (i = 0; i < DRM_NODE_MAX; i++) {
+    for (i = 0; i < DRM_NODE_MAX; i++)
+    {
         device->nodes[i] = ptr;
         ptr += max_node_length;
     }
@@ -4055,7 +4193,8 @@ static int drmProcessPciDevice(drmDevicePtr *device,
         goto free_device;
 
     // Fetch the device info if the user has requested it
-    if (fetch_deviceinfo) {
+    if (fetch_deviceinfo)
+    {
         addr += sizeof(drmPciBusInfo);
         dev->deviceinfo.pci = (drmPciDeviceInfoPtr)addr;
 
@@ -4101,14 +4240,16 @@ static int drm_usb_dev_path(int maj, int min, char *path, size_t len)
         return -errno;
 
     slash = strrchr(tmp_path, '/');
-    if (!slash) {
+    if (!slash)
+    {
         free(tmp_path);
         return -EINVAL;
     }
 
     *slash = '\0';
 
-    if (snprintf(path, len, "%s", tmp_path) >= (int)len) {
+    if (snprintf(path, len, "%s", tmp_path) >= (int)len)
+    {
         free(tmp_path);
         return -EINVAL;
     }
@@ -4211,7 +4352,8 @@ static int drmProcessUsbDevice(drmDevicePtr *device, const char *node,
     if (ret < 0)
         goto free_device;
 
-    if (fetch_deviceinfo) {
+    if (fetch_deviceinfo)
+    {
         ptr += sizeof(drmUsbBusInfo);
         dev->deviceinfo.usb = (drmUsbDeviceInfoPtr)ptr;
 
@@ -4238,7 +4380,8 @@ static int drmParseOFBusInfo(int maj, int min, char *fullname)
 
     name = sysfs_uevent_get(path, "OF_FULLNAME");
     tmp_name = name;
-    if (!name) {
+    if (!name)
+    {
         /* If the device lacks OF data, pick the MODALIAS info */
         name = sysfs_uevent_get(path, "MODALIAS");
         if (!name)
@@ -4246,7 +4389,8 @@ static int drmParseOFBusInfo(int maj, int min, char *fullname)
 
         /* .. and strip the MODALIAS=[platform,usb...]: part. */
         tmp_name = strrchr(name, ':');
-        if (!tmp_name) {
+        if (!tmp_name)
+        {
             free(name);
             return -ENOENT;
         }
@@ -4274,10 +4418,13 @@ static int drmParseOFDeviceInfo(int maj, int min, char ***compatible)
     snprintf(path, sizeof(path), "/sys/dev/char/%d:%d/device", maj, min);
 
     value = sysfs_uevent_get(path, "OF_COMPATIBLE_N");
-    if (value) {
+    if (value)
+    {
         sscanf(value, "%u", &count);
         free(value);
-    } else {
+    }
+    else
+    {
         /* Assume one entry if the device lack OF data */
         count = 1;
     }
@@ -4286,20 +4433,24 @@ static int drmParseOFDeviceInfo(int maj, int min, char ***compatible)
     if (!*compatible)
         return -ENOMEM;
 
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; i++)
+    {
         value = sysfs_uevent_get(path, "OF_COMPATIBLE_%u", i);
         tmp_name = value;
-        if (!value) {
+        if (!value)
+        {
             /* If the device lacks OF data, pick the MODALIAS info */
             value = sysfs_uevent_get(path, "MODALIAS");
-            if (!value) {
+            if (!value)
+            {
                 err = -ENOENT;
                 goto free;
             }
 
             /* .. and strip the MODALIAS=[platform,usb...]: part. */
             tmp_name = strrchr(value, ':');
-            if (!tmp_name) {
+            if (!tmp_name)
+            {
                 free(value);
                 return -ENOENT;
             }
@@ -4346,7 +4497,8 @@ static int drmProcessPlatformDevice(drmDevicePtr *device,
     if (ret < 0)
         goto free_device;
 
-    if (fetch_deviceinfo) {
+    if (fetch_deviceinfo)
+    {
         ptr += sizeof(drmPlatformBusInfo);
         dev->deviceinfo.platform = (drmPlatformDeviceInfoPtr)ptr;
 
@@ -4386,7 +4538,8 @@ static int drmProcessHost1xDevice(drmDevicePtr *device,
     if (ret < 0)
         goto free_device;
 
-    if (fetch_deviceinfo) {
+    if (fetch_deviceinfo)
+    {
         ptr += sizeof(drmHost1xBusInfo);
         dev->deviceinfo.host1x = (drmHost1xDeviceInfoPtr)ptr;
 
@@ -4432,7 +4585,8 @@ process_device(drmDevicePtr *device, const char *d_name,
     if (req_subsystem_type != -1 && req_subsystem_type != subsystem_type)
         return -1;
 
-    switch (subsystem_type) {
+    switch (subsystem_type)
+    {
     case DRM_BUS_PCI:
     case DRM_BUS_VIRTIO:
         return drmProcessPciDevice(device, node, node_type, maj, min,
@@ -4448,7 +4602,7 @@ process_device(drmDevicePtr *device, const char *d_name,
                                       fetch_deviceinfo, flags);
     default:
         return -1;
-   }
+    }
 }
 
 /* Consider devices located on the same bus as duplicate and fold the respective
@@ -4460,9 +4614,12 @@ static void drmFoldDuplicatedDevices(drmDevicePtr local_devices[], int count)
 {
     int node_type, i, j;
 
-    for (i = 0; i < count; i++) {
-        for (j = i + 1; j < count; j++) {
-            if (drmDevicesEqual(local_devices[i], local_devices[j])) {
+    for (i = 0; i < count; i++)
+    {
+        for (j = i + 1; j < count; j++)
+        {
+            if (drmDevicesEqual(local_devices[i], local_devices[j]))
+            {
                 local_devices[i]->available_nodes |= local_devices[j]->available_nodes;
                 node_type = log2_int(local_devices[j]->available_nodes);
                 memcpy(local_devices[i]->nodes[node_type],
@@ -4477,7 +4634,7 @@ static void drmFoldDuplicatedDevices(drmDevicePtr local_devices[], int count)
 static int
 drm_device_validate_flags(uint32_t flags)
 {
-        return (flags & ~DRM_DEVICE_GET_PCI_REVISION);
+    return (flags & ~DRM_DEVICE_GET_PCI_REVISION);
 }
 
 static bool
@@ -4485,8 +4642,10 @@ drm_device_has_rdev(drmDevicePtr device, dev_t find_rdev)
 {
     struct stat sbuf;
 
-    for (int i = 0; i < DRM_NODE_MAX; i++) {
-        if (device->available_nodes & 1 << i) {
+    for (int i = 0; i < DRM_NODE_MAX; i++)
+    {
+        if (device->available_nodes & 1 << i)
+        {
             if (stat(device->nodes[i], &sbuf) == 0 &&
                 sbuf.st_rdev == find_rdev)
                 return true;
@@ -4520,11 +4679,11 @@ drm_public int drmGetDeviceFromDevId(dev_t find_rdev, uint32_t flags, drmDeviceP
      * in /dev along with a large number of statically generated /dev nodes.
      * Avoid stat'ing all of /dev needlessly by implementing this custom path.
      */
-    drmDevicePtr     d;
-    char             node[PATH_MAX + 1];
-    const char      *dev_name;
-    int              node_type, subsystem_type;
-    int              maj, min, n, ret;
+    drmDevicePtr d;
+    char node[PATH_MAX + 1];
+    const char *dev_name;
+    int node_type, subsystem_type;
+    int maj, min, n, ret;
 
     if (device == NULL)
         return -EINVAL;
@@ -4545,7 +4704,7 @@ drm_public int drmGetDeviceFromDevId(dev_t find_rdev, uint32_t flags, drmDeviceP
 
     n = snprintf(node, PATH_MAX, dev_name, DRM_DIR_NAME, min);
     if (n == -1 || n >= PATH_MAX)
-      return -errno;
+        return -errno;
     if (stat(node, &sbuf))
         return -EINVAL;
 
@@ -4590,15 +4749,18 @@ drm_public int drmGetDeviceFromDevId(dev_t find_rdev, uint32_t flags, drmDeviceP
         return -errno;
 
     i = 0;
-    while ((dent = readdir(sysdir))) {
+    while ((dent = readdir(sysdir)))
+    {
         ret = process_device(&d, dent->d_name, subsystem_type, true, flags);
         if (ret)
             continue;
 
-        if (i >= MAX_DRM_NODES) {
+        if (i >= MAX_DRM_NODES)
+        {
             fprintf(stderr, "More than %d drm nodes detected. "
-                    "Please report a bug - that should not happen.\n"
-                    "Skipping extra nodes\n", MAX_DRM_NODES);
+                            "Please report a bug - that should not happen.\n"
+                            "Skipping extra nodes\n",
+                    MAX_DRM_NODES);
             break;
         }
         local_devices[i] = d;
@@ -4610,7 +4772,8 @@ drm_public int drmGetDeviceFromDevId(dev_t find_rdev, uint32_t flags, drmDeviceP
 
     *device = NULL;
 
-    for (i = 0; i < node_count; i++) {
+    for (i = 0; i < node_count; i++)
+    {
         if (!local_devices[i])
             continue;
 
@@ -4703,15 +4866,18 @@ drm_public int drmGetDevices2(uint32_t flags, drmDevicePtr devices[],
         return -errno;
 
     i = 0;
-    while ((dent = readdir(sysdir))) {
+    while ((dent = readdir(sysdir)))
+    {
         ret = process_device(&device, dent->d_name, -1, devices != NULL, flags);
         if (ret)
             continue;
 
-        if (i >= MAX_DRM_NODES) {
+        if (i >= MAX_DRM_NODES)
+        {
             fprintf(stderr, "More than %d drm nodes detected. "
-                    "Please report a bug - that should not happen.\n"
-                    "Skipping extra nodes\n", MAX_DRM_NODES);
+                            "Please report a bug - that should not happen.\n"
+                            "Skipping extra nodes\n",
+                    MAX_DRM_NODES);
             break;
         }
         local_devices[i] = device;
@@ -4722,7 +4888,8 @@ drm_public int drmGetDevices2(uint32_t flags, drmDevicePtr devices[],
     drmFoldDuplicatedDevices(local_devices, node_count);
 
     device_count = 0;
-    for (i = 0; i < node_count; i++) {
+    for (i = 0; i < node_count; i++)
+    {
         if (!local_devices[i])
             continue;
 
@@ -4788,11 +4955,11 @@ drm_public char *drmGetDeviceNameFromFd2(int fd)
 #elif defined(__FreeBSD__)
     return drmGetDeviceNameFromFd(fd);
 #else
-    struct stat      sbuf;
-    char             node[PATH_MAX + 1];
-    const char      *dev_name;
-    int              node_type;
-    int              maj, min, n;
+    struct stat sbuf;
+    char node[PATH_MAX + 1];
+    const char *dev_name;
+    int node_type;
+    int maj, min, n;
 
     if (fstat(fd, &sbuf))
         return NULL;
@@ -4813,7 +4980,7 @@ drm_public char *drmGetDeviceNameFromFd2(int fd)
 
     n = snprintf(node, PATH_MAX, dev_name, DRM_DIR_NAME, min);
     if (n == -1 || n >= PATH_MAX)
-      return NULL;
+        return NULL;
 
     return strdup(node);
 #endif
@@ -4953,7 +5120,7 @@ drm_public int drmSyncobjSignal(int fd, const uint32_t *handles,
 }
 
 drm_public int drmSyncobjTimelineSignal(int fd, const uint32_t *handles,
-					uint64_t *points, uint32_t handle_count)
+                                        uint64_t *points, uint32_t handle_count)
 {
     struct drm_syncobj_timeline_array args;
     int ret;
@@ -4968,9 +5135,9 @@ drm_public int drmSyncobjTimelineSignal(int fd, const uint32_t *handles,
 }
 
 drm_public int drmSyncobjTimelineWait(int fd, uint32_t *handles, uint64_t *points,
-				      unsigned num_handles,
-				      int64_t timeout_nsec, unsigned flags,
-				      uint32_t *first_signaled)
+                                      unsigned num_handles,
+                                      int64_t timeout_nsec, unsigned flags,
+                                      uint32_t *first_signaled)
 {
     struct drm_syncobj_timeline_wait args;
     int ret;
@@ -4991,9 +5158,8 @@ drm_public int drmSyncobjTimelineWait(int fd, uint32_t *handles, uint64_t *point
     return ret;
 }
 
-
 drm_public int drmSyncobjQuery(int fd, uint32_t *handles, uint64_t *points,
-			       uint32_t handle_count)
+                               uint32_t handle_count)
 {
     struct drm_syncobj_timeline_array args;
     int ret;
@@ -5010,7 +5176,7 @@ drm_public int drmSyncobjQuery(int fd, uint32_t *handles, uint64_t *points,
 }
 
 drm_public int drmSyncobjQuery2(int fd, uint32_t *handles, uint64_t *points,
-				uint32_t handle_count, uint32_t flags)
+                                uint32_t handle_count, uint32_t flags)
 {
     struct drm_syncobj_timeline_array args;
 
@@ -5023,11 +5189,10 @@ drm_public int drmSyncobjQuery2(int fd, uint32_t *handles, uint64_t *points,
     return drmIoctl(fd, DRM_IOCTL_SYNCOBJ_QUERY, &args);
 }
 
-
 drm_public int drmSyncobjTransfer(int fd,
-				  uint32_t dst_handle, uint64_t dst_point,
-				  uint32_t src_handle, uint64_t src_point,
-				  uint32_t flags)
+                                  uint32_t dst_handle, uint64_t dst_point,
+                                  uint32_t src_handle, uint64_t src_point,
+                                  uint32_t flags)
 {
     struct drm_syncobj_transfer args;
     int ret;
@@ -5049,7 +5214,8 @@ drmGetFormatModifierFromSimpleTokens(uint64_t modifier)
 {
     unsigned int i;
 
-    for (i = 0; i < ARRAY_SIZE(drm_format_modifier_table); i++) {
+    for (i = 0; i < ARRAY_SIZE(drm_format_modifier_table); i++)
+    {
         if (drm_format_modifier_table[i].modifier == modifier)
             return strdup(drm_format_modifier_table[i].modifier_name);
     }
@@ -5070,7 +5236,8 @@ drmGetFormatModifierVendor(uint64_t modifier)
     unsigned int i;
     uint8_t vendor = fourcc_mod_get_vendor(modifier);
 
-    for (i = 0; i < ARRAY_SIZE(drm_format_modifier_vendor_table); i++) {
+    for (i = 0; i < ARRAY_SIZE(drm_format_modifier_vendor_table); i++)
+    {
         if (drm_format_modifier_vendor_table[i].vendor == vendor)
             return strdup(drm_format_modifier_vendor_table[i].vendor_name);
     }
@@ -5096,7 +5263,8 @@ drmGetFormatModifierName(uint64_t modifier)
     char *modifier_found = NULL;
     unsigned int i;
 
-    for (i = 0; i < ARRAY_SIZE(modifier_format_vendor_table); i++) {
+    for (i = 0; i < ARRAY_SIZE(modifier_format_vendor_table); i++)
+    {
         if (modifier_format_vendor_table[i].vendor == vendorid)
             modifier_found = modifier_format_vendor_table[i].vendor_cb(modifier);
     }
